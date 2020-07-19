@@ -4,4 +4,4 @@ This repository contains my implementation of the a simple ray traces as describ
 More details are in each chapter's folder
 
 ***
-Buck, Jamis. "The Ray Tracer Challenge: A Test-Driven Guide to Your First Renderer".Pragmatic Bookshelf:Raleigh, NC 2019 (ISBN: 1680502719)
+Buck, Jamis. "The Ray Tracer Challenge: A Test-Driven Guide to Your First 3D Renderer".Pragmatic Bookshelf:Raleigh, NC 2019 (ISBN: 1680502719)
