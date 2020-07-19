@@ -1,6 +1,6 @@
 In this chapter, we do our first ray-tracing, dealing with a ray intersecting a sphere.  At this point ray-tracing a sphere 
 resutls in a circle.  At the end of the chapter, you will be producing images such as:
-
-<figure><img src="../images/chapter05.ppm"><figcaption>chapter05 output</figcaption></figure>
+https://github.com/thurizas/Ray-Tracer-Challenge/blob/master/images/chapter05.ppm
+![chapter05 output](https://github.com/thurizas/Ray-Tracer-Challenge/images/chapter05.ppm)
 
 
