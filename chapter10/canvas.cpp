@@ -108,6 +108,8 @@ void canvas::writePPM(const char* fn)
         // in stream position is > 64 from start we need a new line.
         const int maxLine = 64;
 
+        std::cout << "writing to file: " << fn;
+
         // write the header
         outfs << "P3" << std::endl;                        // write magic number...
         outfs << m_width << " " << m_height << std::endl;  // write dimensions...
@@ -116,6 +118,7 @@ void canvas::writePPM(const char* fn)
         // write the pixel data....
         for (int row = 0; row < m_height; row++)
         {
+            std::cout << "..";
             std::streamoff lnBegin = outfs.tellp();
             for (int col = 0; col < m_width; col++)
             {
@@ -161,14 +164,13 @@ void canvas::writePPM(const char* fn)
                     outfs << std::endl;            // move to next line....
                     lnBegin = outfs.tellp();       // reset the start pointer...
                 }
-                        
-                
             }
             outfs << std::endl;
         }
 
         outfs << std::endl;                                 // insure file ends with a new line
         outfs.close();
+        std::cout << std::endl;
     }
     else
     {

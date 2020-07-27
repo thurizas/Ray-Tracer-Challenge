@@ -44,7 +44,7 @@ int main(int argc, char** argv)
         }
     }
 
-    patternTests();
+    //patternTests();
     mainTest(width, height);
 }
 
@@ -113,30 +113,30 @@ void patternTests()
     // features/patterns.feature - a gradient linear interpolates
     gradientPattern pat2(WHITE, BLACK);
     std::cout << "\n\ncolor at point (0,0,0) is (white) " << pat2.stripeAt(point(0, 0, 0), nullptr) << std::endl;
-    std::cout << "color at point (0.25,0,0) is (0.75,0.75,0.75) " << pat2.stripeAt(point(0.25, 0, 0), nullptr) << std::endl;
-    std::cout << "color at point (0.50,0,0) is (0.50,0.50,0.50) " << pat2.stripeAt(point(0.50, 0, 0), nullptr) << std::endl;
-    std::cout << "color at point (0.75,0,0) is (0.25,0.25,0.25) " << pat2.stripeAt(point(0.75, 0, 0), nullptr) << std::endl;
+    std::cout << "color at point (0.25,0,0) is (0.75,0.75,0.75) " << pat2.stripeAt(point(0.25f, 0, 0), nullptr) << std::endl;
+    std::cout << "color at point (0.50,0,0) is (0.50,0.50,0.50) " << pat2.stripeAt(point(0.50f, 0, 0), nullptr) << std::endl;
+    std::cout << "color at point (0.75,0,0) is (0.25,0.25,0.25) " << pat2.stripeAt(point(0.75f, 0, 0), nullptr) << std::endl;
 
     //features/patterns.feature - a ring should extend in both x and z
     radialPattern pat3(WHITE, BLACK);
     std::cout << "\n\ncolor at point (0,0,0) is (white) " << pat3.stripeAt(point(0, 0, 0), nullptr) << std::endl;
     std::cout << "color at point (1,0,0) is (black) " << pat3.stripeAt(point(1, 0, 0), nullptr) << std::endl;
     std::cout << "color at point (0,0,1) is (black) " << pat3.stripeAt(point(0, 0, 1), nullptr) << std::endl;
-    std::cout << "color at point (0.708, 0, 0.785) is (black) " << pat3.stripeAt(point(0.708, 0, 0.708), nullptr) << std::endl;
+    std::cout << "color at point (0.708f, 0, 0.785f) is (black) " << pat3.stripeAt(point(0.708f, 0, 0.708f), nullptr) << std::endl;
 
     // features/oatterns.feature - checkers should repeat in x
     checkeredPattern pat4(WHITE, BLACK);
     std::cout << "\n\ncolor at point(0,0,0) is (white) " << pat4.stripeAt(point(0, 0, 0)) << std::endl;
-    std::cout << "color at point(0.99,0,0) is (white) " << pat4.stripeAt(point(0.99, 0, 0)) << std::endl;
-    std::cout << "color at point(1.01,0,0) is (black) " << pat4.stripeAt(point(1.01, 0, 0)) << std::endl;
+    std::cout << "color at point(0.99f,0,0) is (white) " << pat4.stripeAt(point(0.99f, 0, 0)) << std::endl;
+    std::cout << "color at point(1.01f,0,0) is (black) " << pat4.stripeAt(point(1.01f, 0, 0)) << std::endl;
 
     // features/patterns.feature - checkers should repeat in y
-    std::cout << "\ncolor at point(0,0.99,0) is (white) " << pat4.stripeAt(point(0, 0.99, 0)) << std::endl;
-    std::cout << "color at point(0, 1.01,0) is (black) " << pat4.stripeAt(point(0, 1.01, 0)) << std::endl;
+    std::cout << "\ncolor at point(0,0.99f,0) is (white) " << pat4.stripeAt(point(0, 0.99f, 0)) << std::endl;
+    std::cout << "color at point(0, 1.01f,0) is (black) " << pat4.stripeAt(point(0, 1.01f, 0)) << std::endl;
 
     // features/patterns.feature - checkers should repeat in z
-    std::cout << "\ncolor at point(0,0,0.99) is (white) " << pat4.stripeAt(point(0, 0, 0.99)) << std::endl;
-    std::cout << "color at point(0,0, 1.01) is (black) " << pat4.stripeAt(point(0, 0, 1.01)) << std::endl;
+    std::cout << "\ncolor at point(0,0,0.99) is (white) " << pat4.stripeAt(point(0, 0, 0.99f)) << std::endl;
+    std::cout << "color at point(0,0, 1.01) is (black) " << pat4.stripeAt(point(0, 0, 1.01f)) << std::endl;
 }
 
 
@@ -163,7 +163,24 @@ void mainTest(int width, int height)
     pmat->d(0.7f);
     pmat->sp(0.3f);
     pmat->p(&pat1);
-    
+
+    // define right - backdrop
+    plane p2;
+    p2.xform(translation(20, 0, 20) * rotation_y(45) * rotation_x(-90));
+    material* pmat1 = p2.getMat();
+    pmat1->c(color(0.5019f, 0.2510f, 0.2510f));
+    pmat1->d(0.7f);
+    pmat1->sp(0.3f);
+    pmat1->p(&pat1);
+
+    // define left-backdrop
+    plane p3;
+    p3.xform(translation(-20, 0, 20) * rotation_y(-45) * rotation_x(-90));
+    material* pmat2 = p3.getMat();
+    pmat2->c(color(0.5019f, 0.2510f, 0.2510f));
+    pmat2->d(0.7f);
+    pmat2->sp(0.3f);
+    pmat2->p(&pat1);
 
     // define the middle sphere
     sphere middle(point(0.0f, 0.0f, 0.0f));
@@ -172,22 +189,6 @@ void mainTest(int width, int height)
     pmat->c(color(0.1f, 1, 0.5f));
     pmat->d(0.7f);
     pmat->sp(0.3f);
-
-    // define the right sphere
-    //sphere right(point(0.0f, 0.0f, 0.0f));
-    //right.xform(translation(1.5f, 0.5f, -0.5f)*scale(0.5f, 0.5f, 0.5f));
-    //pmat = right.getMat();
-    //pmat->c(color(0.5f, 1, 0.1f));
-    //pmat->d(0.7f);
-    //pmat->sp(0.3f);
-
-    // define the left sphere
-    //sphere left(point(0.0f, 0.0f, 0.0f));
-    //left.xform(translation(-1.5f, 0.45f, -0.75f)*scale(0.33f, 0.33f, 0.33f));
-    //pmat = left.getMat();
-    //pmat->c(color(1.0f, 0.8f, 0.1f));
-    //pmat->d(0.7f);
-    //pmat->sp(0.3f);
 
     // define the light source...  
     light l(color(1, 1, 1), point(-10, 10, -10));
@@ -199,9 +200,9 @@ void mainTest(int width, int height)
     // build da world...
     world* w = world::createWorld();
     w->addObject(&pl);
-    //w->addObject(&left);
+    w->addObject(&p2);
+    w->addObject(&p3);
     w->addObject(&middle);
-    //w->addObject(&right);
     w->addLight(&l);
 
     // build a canvas and render...

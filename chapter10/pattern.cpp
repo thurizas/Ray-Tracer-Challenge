@@ -29,7 +29,7 @@ color stripePattern::stripeAt(point pt, object* o)
 
     point patSpace = (xform().inverse())*objSpace;
 
-    int x = floor(patSpace.x());
+    int x = (int)floor(patSpace.x());
 
     if (x % 2 == 0) return m_a;
     else return m_b;
@@ -49,7 +49,7 @@ color gradientPattern::stripeAt(point pt, object* o)
 
     point patSpace = (xform().inverse())*objSpace;
 
-    color cl = m_a + (m_b - m_a)*(patSpace.x() - floor(patSpace.x()));
+    color cl = m_a + (m_b - m_a)*(patSpace.x() - (int)floor(patSpace.x()));
     return cl;
 }
 
@@ -69,7 +69,7 @@ color radialPattern::stripeAt(point pt, object* o)
 
     float u = patSpace.x();
     float v = patSpace.z();
-    int r = floor(sqrt(u*u + v * v));
+    int r = (int)floor(sqrt(u*u + v * v));
 
     if (r % 2 == 0) return m_a;
     else return m_b;
@@ -90,9 +90,9 @@ color checkeredPattern::stripeAt(point pt, object* o)
 
     point patSpace = (xform().inverse())*objSpace;
 
-    int u = floor(patSpace.x());
-    int v = floor(patSpace.y());
-    int w = floor(patSpace.z());
+    int u = (int)floor(patSpace.x());
+    int v = (int)floor(patSpace.y());
+    int w = (int)floor(patSpace.z());
 
     if ((u+v+w) % 2 == 0) return m_a;
     else return m_b;

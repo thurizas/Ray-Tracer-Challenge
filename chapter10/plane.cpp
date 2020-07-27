@@ -7,6 +7,18 @@
 void plane::xform(matrix4x4 T)
 {
     m_matXform = T * m_matXform;            // start chain with the default matrix
+
+    // need to adjust normal for transformation
+    vector modelN = localNormalAt(m_ptCenter);                  // calculate normal in model coordinates
+    vector worldN = (m_matXform.inverse()).transpose()* modelN; // convert from model to world coordinates
+
+    worldN.w(0.0f);                                             // fix up homologeous coordinate, 
+    worldN.normalize();                                         // normalize the normal
+
+    m_vecNormal = worldN;
+
+    // need to adjust the center
+    m_ptCenter = m_matXform * m_ptCenter;
 }
 
 bool plane::intersect(const ray& r, pInterInfo pInter)
@@ -15,12 +27,13 @@ bool plane::intersect(const ray& r, pInterInfo pInter)
     vector d = const_cast<ray&>(r).direction();
     point  o = const_cast<ray&>(r).origin();
 
-    float denom = m_vecNormal.dot(d);
+    float denom = m_vecNormal.dot(d);      // test if line is parallel to plane
 
     if (fabs(denom) > EPSILON)             // intersection happened
     {
         float t = (m_ptCenter - o).dot(m_vecNormal) / denom;
-        if (t >= 0)
+        //if (fabs(t) >= 0)
+        if(t >= 0)
         {
             pInter->m_nCnt = 1;
             pInter->m_nt1 = t;
