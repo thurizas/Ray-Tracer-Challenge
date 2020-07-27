@@ -248,7 +248,9 @@ std::ostream& operator<<(std::ostream& os, const matrix4x4& m)
         os << "| ";
         for (int col = 0; col < size; col++)
         {
-            os << const_cast<matrix4x4&>(m).getElement(MAKENDX(row, col, size)) << " ";
+            float ele = const_cast<matrix4x4&>(m).getElement(MAKENDX(row, col, size));
+            if (fabs(ele) < EPSILON) ele = 0;
+            os << ele << " ";
         }
         os << " |\n";
     }

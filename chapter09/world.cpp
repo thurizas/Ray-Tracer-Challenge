@@ -79,7 +79,6 @@ color world::intersect(ray r, int intNdx)
                 plane* pPlane = dynamic_cast<plane*>((*iter).second);
                 if (pPlane->intersect(r, &intInfo))
                 {
-                    std::cout << "    world::intersect - ray hit plane" << std::endl;
                     m_vecIntersections.push_back(std::pair<int, float>(pPlane->getID(), intInfo.t1()));
                     bret = true;
                 }
@@ -102,7 +101,6 @@ color world::intersect(ray r, int intNdx)
 
         //printIntersections();
         //printIntersectionData(&id);
-        std::cout << "        world::intersect pixel color: " << worldColor << std::endl;
 
         return worldColor;
     }
@@ -138,16 +136,12 @@ bool world::intersect(ray r, float d)
             }
             else if (PLANE == (*iter).second->getType())
             {
-                std::cout << "            world::intersect checking for intersections: ";
                 plane* pPlane = dynamic_cast<plane*>((*iter).second);
                 if (pPlane->intersect(r, &intInfo))
                 {
-                    std::cout << "found one" << std::endl;
                     vecShadowHits.push_back(std::pair<int, float>(pPlane->getID(), intInfo.t1()));
                     bhit = true;
                 }
-                else
-                    std::cout << "no intersection" << std::endl;
             }
             else
             {

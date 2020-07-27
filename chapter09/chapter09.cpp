@@ -118,17 +118,17 @@ void planeTests()
     interInfo   inter;
     ray r1(point(0, 10, 0), vector(0, 0, 1));
     bool bInter = pl1.intersect(r1, &inter);
-    std::cout << "\n\nray r1 intersects plane pl1 at: (empty)" << (bInter ? " intersection at": " no intersection") << std::endl;
+    std::cout << "\n\nray r1 " << r1 << "intersects plane pl1 at: (empty)" << (bInter ? " intersection at": " no intersection") << std::endl;
 
     //​Scenario​: Intersect with a coplanar ray ​  
     ray r2(point(0, 0, 0), vector(0, 0, 1));
     bInter = pl1.intersect(r2, &inter);
-    std::cout << "ray r2 intersects plane pl1 at: (empty)" << (bInter ? " intersection at" : " no intersection") << std::endl;
+    std::cout << "\nray r2 " << r2 << "intersects plane pl1 at: (empty)" << (bInter ? " intersection at" : " no intersection") << std::endl;
 
    //Scenario​: A ray intersecting a plane from above
     ray r3(point(0, 1, 0), vector(0, -1, 0));
     bInter = pl1.intersect(r3, &inter);
-    std::cout << "ray r3 intersects plane pl1 at: ";
+    std::cout << "\nray r3 " << r3 << " intersects plane pl1 at: ";
     if (bInter)
         std::cout << "count " << inter.getCnt() << " " << inter.m_nt1 << std::endl;
     else
@@ -138,7 +138,32 @@ void planeTests()
     inter.clear();
     ray r4(point(0, -1, 0), vector(0, 1, 0));
     bInter = pl1.intersect(r4, &inter);
-    std::cout << "ray r4 intersets plane pl1 at: ";
+    std::cout << "\nray r4 " << r4 << "intersets plane pl1 at: ";
+    if (bInter)
+        std::cout << "count " << inter.getCnt() << " " << inter.m_nt1 << std::endl;
+    else
+        std::cout << " no intersection";
+
+    // Scenario : transforming a plane
+    plane pl2;
+    pl2.xform(rotation_x(-90));
+    std::cout << "\n\ntransformed plane is: " << pl2 << std::endl;
+
+    // Scenario : A ray intersection xformed  plane
+    ray r5(point(1, 2, 3), vector(0, 0, 1));
+    inter.clear();
+    bInter = pl2.intersect(r5, &inter);
+    std::cout << "\nray r5 " << r5 << " intersets plane pl1 at: ";
+    if (bInter)
+        std::cout << "count " << inter.getCnt() << " " << inter.m_nt1 << std::endl;
+    else
+        std::cout << " no intersection";
+
+    // Scenario : A ray intersection xformed  plane
+    ray r6(point(1, 2, 3), vector(0, 0, -1));
+    inter.clear();
+    bInter = pl2.intersect(r6, &inter);
+    std::cout << "\nray r6 " << r5 << " intersets plane pl1 at: ";
     if (bInter)
         std::cout << "count " << inter.getCnt() << " " << inter.m_nt1 << std::endl;
     else
@@ -153,16 +178,23 @@ void planeTests()
 void mainTest()
 {
     int   width = 640;//640 /*100*/;
-    int   height = 480;//480/*50*/;
+    int   height = 480/*50*/;
 
     // define the floor
     plane pl;
-    pl.xform(scale(40, 1, 40));
-    //pl.xform(translation(1, 1, 1));
     material* pmat = pl.getMat();
     pmat->c(color(0.5019f, 0.2510f, 0.2510f));
     pmat->d(0.7f);
     pmat->sp(0.3f);
+
+    // define backdrop
+    plane pl1;
+    pl1.xform(translation(0, 0, 40) * rotation_x(-90));
+    material* pmat1 = pl1.getMat();
+    pmat1->c(color(1.0f, 0, 0));
+    std::cout << "the back drop is: " << pl1 << std::endl;
+
+
 
     // define the middle sphere
     sphere middle(point(0.0f, 0.0f, 0.0f));
@@ -198,16 +230,15 @@ void mainTest()
     // build da world...
     world* w = world::createWorld();
     w->addObject(&pl);
+    w->addObject(&pl1);
     w->addObject(&left);
     w->addObject(&middle);
     w->addObject(&right);
     w->addLight(&l);
-
-    std::cout << "world is: " << *w << std::endl;
     
     // build a canvas and render...
     canvas i(c.hsize(), c.vsize());
     c.render(w, &i);
 
-    i.writePPM("./chapter09a.ppm");
+    i.writePPM("./chapter09c.ppm");
 }

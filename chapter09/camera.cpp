@@ -93,17 +93,26 @@ ray camera::rayToPoint(float px, float py)
 
 void camera::render(world* w, canvas* i)
 {
+    int len = 0;
+    int cntPixels = m_vsize * m_hsize;
+
     for (int y = 0; y < m_vsize - 1; y++)
     {
         for (int x = 0; x < m_hsize - 1; x++)
         {
-            std::cout << "calculating pixel at (" << x << ", " << y << ")" << std::endl;
             ray r = rayToPoint((float)x, (float)y);
             color c = w->intersect(r);
             i->setColor(x, y, c);
         }
-        
+
+        if (len != 0) for (int ndx = 0; ndx < len; ndx++) fprintf(stdout, "\b");
+        len = fprintf(stdout, "percent done: %4.2f", (float)((y + 1)*m_hsize * 100) / (float)cntPixels);
     }
+
+
+
+
+
 }
 
 
