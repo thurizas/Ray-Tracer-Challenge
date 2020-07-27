@@ -1,7 +1,7 @@
 In this chapter, we do our first ray-tracing, dealing with a ray intersecting a sphere.  At this point ray-tracing a sphere 
 resutls in a circle.  At the end of the chapter, you will be producing images such as:
 
-
+<img src="images/chapter05.png" title="chapter 05 output" width="150" height="100" /> 
 
 <img src="https://github.com/thurizas/Ray-Tracer-Challenge/blob/master/images/chapter05.png" title="chapter 05 output" width="150" height="100" /> 
 
