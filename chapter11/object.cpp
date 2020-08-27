@@ -7,7 +7,7 @@ int object::m_nCount = 0;                 // total count of object created
 object::object(material* pm, unsigned short t) : m_pMat(pm), m_nType(t)
 {
     m_xform = matrix4x4::identity();             // set transformation matrix to idenity
-    m_nID = getNextId();
+    //m_nID = getNextId();
 }
 
 object::~object()

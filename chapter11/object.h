@@ -48,7 +48,8 @@ public:
     object(material* pm, unsigned short t);
     virtual ~object();
 
-    int getNextId() { return this->m_nCount++; }
+    //int getNextId() { return this->m_nCount++; }
+    void setID(int id) { m_nID = id; }
     int getType() { return m_nType; }
     unsigned int getID() { return m_nID; }
     

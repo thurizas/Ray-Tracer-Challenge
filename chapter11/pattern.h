@@ -10,13 +10,15 @@
 
 const color WHITE = color(1.0, 1.0, 1.0);
 const color BLACK = color(0.0, 0.0, 0.0);
+const color RED = color(1.0, 0.0, 0.0);
+const color YELLOW = color(1.0, 1.0, 0.0);
 
 class object;
 
 class pattern
 {
 public:
-    enum {STRIPED=0, GRADIENT, RING, CHECKERED };
+    enum {TEST=0,STRIPED, GRADIENT, RING, CHECKERED };
     pattern(color a, color b, int t) : m_type(t), m_a(a), m_b(b), m_xform(matrix4x4::identity())
     { }
     virtual ~pattern() { }
@@ -50,6 +52,15 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+class defPattern : public pattern
+{
+public:
+    defPattern(color a=WHITE, color b=BLACK) : pattern(a, b, TEST)
+    { }
+    ~defPattern() { }
+    virtual color stripeAt(point pt, object* o = nullptr);
+};
+
 class stripePattern : public pattern
 {
 public:

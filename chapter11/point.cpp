@@ -76,9 +76,9 @@ vector point::operator-(const point& rhs)
 
 std::ostream& operator<<(std::ostream& os, const point& v)
 {
-    os << "( " << (const_cast<point&>(v).x() < EPSILON ? 0 : const_cast<point&>(v).x()) << ", ";
-    os << (const_cast<point&>(v).y() < EPSILON ? 0 : const_cast<point&>(v).y()) << ", ";
-    os << (const_cast<point&>(v).z() < EPSILON ? 0 : const_cast<point&>(v).z()) << ", ";
-    os << (const_cast<point&>(v).w() < EPSILON ? 0 : const_cast<point&>(v).w()) << ")";
+    os << "( " << (fabs(const_cast<point&>(v).x()) < EPSILON ? 0 : const_cast<point&>(v).x()) << ", ";
+    os << (fabs(const_cast<point&>(v).y()) < EPSILON ? 0 : const_cast<point&>(v).y()) << ", ";
+    os << (fabs(const_cast<point&>(v).z()) < EPSILON ? 0 : const_cast<point&>(v).z()) << ", ";
+    os << (fabs(const_cast<point&>(v).w()) < EPSILON ? 0 : const_cast<point&>(v).w()) << ")";
     return os;
 }

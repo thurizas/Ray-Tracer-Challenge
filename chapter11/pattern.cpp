@@ -3,8 +3,7 @@
 #include "object.h"
 #include "pattern.h"
 
-const char* types[] = { "striped  ", "gradient ", "ring     ", "checkered" };
-
+const char* types[] = { "test     ", "striped  ", "gradient ", "ring     ", "checkered" };
 std::string pattern::type()
 { 
     return types[m_type]; 
@@ -15,6 +14,23 @@ void pattern::print() const
     std::cout << "pattern is: " << types[m_type] << "color one: " << m_a << " color two:" << m_b << std::endl;
     std::cout << "transformation applied is: " << m_xform << std::endl;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// implementation of the def pattern
+color defPattern::stripeAt(point pt, object* o)
+{
+    point objSpace;
+
+    if (o != nullptr)
+        objSpace = (o->xform().inverse())*pt;
+    else
+        objSpace = pt;
+
+    point patSpace = (xform().inverse())*objSpace;
+
+    return color(patSpace.x(), patSpace.y(), patSpace.z());
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // implementation of striped pattern

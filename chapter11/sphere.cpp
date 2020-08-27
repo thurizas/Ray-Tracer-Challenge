@@ -79,15 +79,12 @@ vector sphere::normalAt(point worldPt)
 }
 
 
-
-
-
 std::ostream& operator<<(std::ostream& os, const sphere& s)
 {
-    os << "sphere: " << const_cast<sphere&>(s).getID() << " center at: ";
-    os << const_cast<sphere&>(s).getCenter();
-    os << " with radius: " << const_cast<sphere&>(s).getRadius();
-    os << "\n" << *(const_cast<sphere&>(s).getMat());
+    os << "id: " << const_cast<sphere&>(s).getID() << std::endl;
+    os << "   center at: " << const_cast<sphere&>(s).getCenter() << std::endl;
+    os << "   with radius: " << const_cast<sphere&>(s).getRadius() << std::endl;
+    os << *(const_cast<sphere&>(s).getMat());
     os << "\ntransform used is\n" << const_cast<sphere&>(s).xform();
 
     return os;
