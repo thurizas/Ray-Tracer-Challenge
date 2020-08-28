@@ -43,18 +43,20 @@ void fresnelTest2();                // ray hits surface at 90 degree angle
 void fresnelTest3();                // n2 > n1 and angle is small
 void fresnetTest4();                // shadeHit cal'cs correct
 
-void test();
-
 void reflectionTest(int, int);
 void refractionTest(int, int);
+void mainTest(int, int);
+
+bool g_bDebug;
 
 int main(int argc, char** argv)
 {
     int choice;
     int width = 640;
     int height = 400;
+    bool g_bDebug = false;
 
-    while (-1 != (choice = getopt(argc, argv, "w:h:")))
+    while (-1 != (choice = getopt(argc, argv, "w:h:d")))
     {
         switch (choice)
         {
@@ -65,6 +67,9 @@ int main(int argc, char** argv)
         case 'h':
             height = atoi(optarg);
             break;
+
+        case 'd':
+            g_bDebug = true;
 
         default:
             ;
@@ -85,18 +90,17 @@ int main(int argc, char** argv)
     //refractionTest4();                            // color for refracted ray with opaque material
     //refractionTest5();                            // color at limit of recurrsion
     //refractionTest6();                            // test for internal reflection      
-    //refractionTest7(); //TODO: check              // refracted color with refracted ray
+    //refractionTest7();                            // refracted color with refracted ray
     //refractionTest8();                            // shadeHit cal'cs correct color
-
-    test();
 
     //fresnelTest1();                                 // reflectance under total internal reflectance
     //fresnelTest2();                                 // ray hits surface at 90 degree angle
     //fresnelTest3();                                 // n2 > n1 and angle is small
     //fresnetTest4();                                 // shadeHit cal'cs correct
 
-    //reflectionTest(width, height);                // main reflection test
-    //refractionTest(width, height);                // main refraction test
+    reflectionTest(width, height);                // main reflection test
+    refractionTest(width, height);                // main refraction test
+    //mainTest(width, height);
 }
 
 void reflectionTest1()
@@ -419,7 +423,7 @@ void refractionTest6()
 void refractionTest7()
 {
     // test #7 - features/world.feature - the refracted color with a refracted ray
-    world* pW = defaultWorld();
+    world* pW = defaultWorld(g_bDebug);
     pW->getObject(1)->getMat()->a(1.0f);
     pW->getObject(1)->getMat()->p(new defPattern());   
     pW->getObject(2)->getMat()->transpar(1.0);
@@ -444,7 +448,7 @@ void refractionTest7()
 void refractionTest8()
 {
     // test #8 - features/world.feature - shade_hit() with a transparent material
-    world* pW = defaultWorld();
+    world* pW = defaultWorld(true);
 
     plane floor;
     floor.xform(translation(0.0, -1.0f, 0.0));
@@ -463,7 +467,8 @@ void refractionTest8()
     color cl = pW->intersect(r);
 
     std::cout << "\n*** test #8 ************************" << std::endl;
-    std::cout << "intersections are (1.40411:3) : " << std::endl;
+    std::cout << "intersections are (1.41421:3) : " << std::endl;
+    std::cout << "intersections are (1.92237:4) : " << std::endl;
     std::vector < std::pair<int, float>> inters = pW->getIntersections();
     for (auto inter : inters)
     {
@@ -471,39 +476,7 @@ void refractionTest8()
     }
     std::cout << "\n The final color is (0.93642, 0.68642, 0.68642): " << cl << std::endl;
 }
-// remember to uncomment lines in shadeHit
-void test()
-{
-    world* pW = world::createWorld();
 
-    sphere s1(point(0, 0, 0), 1.0);
-    s1.getMat()->transpar(1.0f);
-    s1.getMat()->refractIndex(1.1f);
-
-    // define the backdrop
-    plane pl;
-    pl.xform(translation(20, 0, 20) *  rotation_x(-90));
-    pl.getMat()->c(color(1.0f, 0.0f, 0.0f));
-    pl.getMat()->a(1.0f);
-
-    // define the light source...  
-    light l(color(1, 1, 1), point(-10, 10, -10));
-
-
-    pW->addObject(&s1);
-    pW->addLight(&l);
-    pW->addObject(&pl);
-
-    ray r1(point(0, 1.0f/(float)sqrt(2.0), -3.0f), vector(0.0f, 0.0f, 1.0f));
-    //ray r1(point(0, 0.5, -3.0f), vector(0.0f, 0.0f, 1.0f));
-    //ray r1(point(0, (float)sqrt(3.0f) / 2.0f, -3.0f), vector(0.0f, 0.0f, 1.0f));
-    //ray r1(point(0, 0, 3.0f), vector(0.0f, 0.0f, 1.0f));
-    color pixel = pW->intersect(r1);
-
-    pIntDataT pID = pW->getIntData();
-    std::cout << "\n\n" << *pID << std::endl;
-    std::cout << "\npixel color is: " << pixel << std::endl;
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Fresnel tests
@@ -601,7 +574,6 @@ void reflectionTest(int width, int height)
     checkeredPattern pat1(WHITE, BLACK);
     pat1.xform(scale(2, 1, 2));
 
-
     // define the floor
     plane pl;
     material* pmat = pl.getMat();
@@ -682,12 +654,6 @@ void refractionTest(int width, int height)
     pmat3->transpar(1.0f);
     pmat3->refractIndex(1.5f);
 
-    // define the inner sphere
-    //sphere inner(point(0.0f, 0.0f, 0.0f));
-    //material* pmat4 = inner.getMat();
-    //pmat4->transpar(1.0f);
-    //pmat4->refractIndex(1.5);
-
     // define the light source...  
     light l(color(1, 1, 1), point(-10, 10, -10));
 
@@ -699,7 +665,6 @@ void refractionTest(int width, int height)
     world* w = world::createWorld();
     w->addObject(&pl);
     w->addObject(&outer);
-    //w->addObject(&inner);
     w->addLight(&l);
 
     // build a canvas and render...
@@ -709,36 +674,102 @@ void refractionTest(int width, int height)
     i.writePPM("./chapter11b.ppm");
 }
 
+void mainTest(int width, int height)
+{
+    width = 300;
+    height = 150;
+    std::cout << "creating image " << width << "x" << height << std::endl;
+
+    // define a pattern
+    checkeredPattern pat1(WHITE, BLACK);
+    pat1.xform(scale(2, 1, 2));
+
+    // define the floor
+    plane pl;;
+    pl.getMat()->d(0.7f);
+    pl.getMat()->sp(0.3f);
+    pl.getMat()->reflect(0.5f);
+    pl.getMat()->p(&pat1);
+
+    // define right - backdrop
+    plane p2;
+    p2.xform(translation(20, 0, 20) * rotation_y(45) * rotation_x(-90));
+    material* pmat1 = p2.getMat();
+    pmat1->c(color(176.0f / 255.0f, 232.0f / 255.0f, 236.0f / 255.0f));
+    pmat1->d(0.7f);
+    pmat1->sp(0.3f);
+
+    // define left-backdrop
+    plane p3;
+    p3.xform(translation(-20, 0, 20) * rotation_y(-45) * rotation_x(-90));
+    material* pmat2 = p3.getMat();
+    pmat2->c(color(176.0f / 255.0f, 232.0f / 255.0f, 236.0f / 255.0f));
+    pmat2->d(0.7f);
+    pmat2->sp(0.3f);
+
+    // create red ball
+    sphere sp1(point(0.0f, 0.0f, 0.0f));
+    sp1.xform(translation(4.0f, 1.0f, 4.0f));
+    sp1.getMat()->c(color(0.8f, 0.1f, 0.3f));
+    sp1.getMat()->sp(0.0f);
+
+    // create green ball
+    sphere sp2(point(0.0f, 0.0f, 0.0f));
+    sp2.xform(scale(0.4f, 0.4f, 0.4f));
+    sp2.xform(translation(4.6f, 0.4f, 2.9f));
+    //sp2.xform(scale(0.4f, 0.4f, 0.4f)*translation(4.6f, 0.5f, 2.9f));
+    sp2.getMat()->c(color(0.1f, 0.8f, 0.2f));
+    sp2.getMat()->sh(200.0f);
+
+    // create blue ball
+    sphere sp3(point(0.0f, 0.0f, 0.0f));
+    sp3.xform(scale(0.6f, 0.6f, 0.6f));
+    sp3.xform(translation(2.6f, 0.6f, 4.4f));
+    sp3.getMat()->c(color(0.2f, 0.1f, 0.8f));
+    sp3.getMat()->sh(10.0f);
+    sp3.getMat()->sp(0.4f);
+
+    // create glass ball
+    sphere sp4(point(0.0f, 0.0f, 0.0f));
+    sp4.xform(translation(0.25f, 1.0f, 0.0f));
+    sp4.getMat()->c(color(0.8f, 0.8f, 0.9f));
+    sp4.getMat()->a(0.0f);
+    sp4.getMat()->d(0.9f);
+    sp4.getMat()->sp(0.9f);
+    sp4.getMat()->sh(300.0f);
+    sp4.getMat()->transpar(0.8f);
+    sp4.getMat()->refractIndex(1.57f);
+
+    // define the light source...  
+    light l(color(1, 1, 1), point(-4.9f, 4.9f, 1));
+
+    // define the camera  camera(int, int, float, matrix4x4)
+    camera c(width, height, 0.5, matrix4x4::identity());
+    c.t(viewTransform(point(-4.5f, 0.85f, -4), point(0, 0.85f, 0), vector(0, 1, 0)));
+
+    // build da world...
+    world* w = world::createWorld();
+    w->addObject(&pl);
+    w->addObject(&p2);
+    w->addObject(&p3);
+    w->addObject(&sp1);
+    w->addObject(&sp2);
+    w->addObject(&sp3);
+    w->addObject(&sp4);
+    w->addLight(&l);
+
+    // build a canvas and render...
+    canvas i(c.hsize(), c.vsize());
+    c.render(w, &i);
+
+    i.writePPM("./chapter11c.ppm");
+}
+
+
 /*
-    `monsters.yaml`
-
-```
-- name: Ogre
-  position: [0, 5, 0]
-  powers:
-    - name: Club
-      damage: 10
-    - name: Fist
-      damage: 8
-- name: Dragon
-  position: [1, 0, 10]
-  powers:
-    - name: Fire Breath
-      damage: 25
-    - name: Claws
-      damage: 15
-- name: Wizard
-  position: [5, -3, 0]
-  powers:
-    - name: Acid Rain
-      damage: 50
-    - name: Staff
-      damage: 3
-```
-
 `main.cpp`
 
-```
+
 #include "yaml-cpp/yaml.h"
 #include <iostream>
 #include <fstream>

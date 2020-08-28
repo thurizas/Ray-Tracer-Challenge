@@ -9,4 +9,4 @@
 
 std::ostream& operator<<(std::ostream&, const std::pair<int, float>);
 sphere* glassSphere();
-world* defaultWorld();
+world* defaultWorld(bool debug = false);

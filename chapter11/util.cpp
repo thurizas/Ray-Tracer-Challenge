@@ -22,9 +22,9 @@ sphere* glassSphere()
     return pSphere;
 }
 
-world* defaultWorld()
+world* defaultWorld(bool debug)
 {
-    world* pWorld = world::createWorld();
+    world* pWorld = world::createWorld(debug);
 
     light* pLight = new light(color(1, 1, 1), point(-10, 10, -10));
 

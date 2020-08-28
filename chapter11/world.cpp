@@ -12,11 +12,11 @@
 
 world* world::m_pThis = nullptr;
 
-world* world::createWorld(color defColor)
+world* world::createWorld(bool bDebug, color defColor)
 {
     if (m_pThis == nullptr)
     {
-        m_pThis = new world(defColor);
+        m_pThis = new world(bDebug, defColor);
     }
 
     return m_pThis;
@@ -103,10 +103,10 @@ object* world::getObject(unsigned int ndx)
 * written : (7/29/2020)
 */
 color world::intersect(ray r, int remaining, int intNdx)
- {
-     bool bret = false;
-     std::cout << "\nRecursion count " << remaining << " Using ray: " << r << std::endl;
-    
+{
+    bool bret = false;
+    if (m_bDebug) std::cout << "\nRecursion count " << remaining << " Using ray: " << r << std::endl;
+
     if (m_vecIntersections.size() > 0)             // delete any old intersections, if any
     {
         m_vecIntersections.erase(m_vecIntersections.begin(), m_vecIntersections.end());
@@ -129,17 +129,19 @@ color world::intersect(ray r, int remaining, int intNdx)
                 sphere* pSphere = dynamic_cast<sphere*>((*iter).second);
                 if (pSphere->intersect(r, &intInfo))
                 {
-                    m_vecIntersections.push_back ( std::pair<int, float>(pSphere->getID(), intInfo.t1()));
-                    m_vecIntersections.push_back ( std::pair<int, float>(pSphere->getID(), intInfo.t2()));
+                    if (m_bDebug) std::cout << "hit sphere " << (*iter).second->getID() << std::endl;
+                    m_vecIntersections.push_back(std::pair<int, float>(pSphere->getID(), intInfo.t1()));
+                    m_vecIntersections.push_back(std::pair<int, float>(pSphere->getID(), intInfo.t2()));
 
                     bret = true;
                 }
             }
-            else if(PLANE == (*iter).second->getType())
+            else if (PLANE == (*iter).second->getType())
             {
                 plane* pPlane = dynamic_cast<plane*>((*iter).second);
                 if (pPlane->intersect(r, &intInfo))
                 {
+                    if (m_bDebug) std::cout << "hit plane " << (*iter).second->getID() << std::endl;
                     m_vecIntersections.push_back(std::pair<int, float>(pPlane->getID(), intInfo.t1()));
                     bret = true;
                 }
@@ -153,11 +155,15 @@ color world::intersect(ray r, int remaining, int intNdx)
 
     }
 
-    for (auto inter : m_vecIntersections)
+    if (m_bDebug)
     {
-        std::cout << inter.second << ":" << inter.first << ", ";
+        for (auto inter : m_vecIntersections)
+        {
+            std::cout << inter.second << ":" << inter.first << ", ";
+        }
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
+
 
     if (bret)
     {
@@ -165,6 +171,8 @@ color world::intersect(ray r, int remaining, int intNdx)
 
         prepare(r, m_pID, intNdx);
         
+        if (m_bDebug) std::cout << *m_pID << std::endl;
+
         color objColor = shadeHit(m_pID, remaining);
 
         return objColor;
@@ -313,7 +321,7 @@ void world::prepare(ray r, pIntDataT pID, int intNdx)
 * abstract: This function determines the color of a pixel, based on the lighting, material and if the point is in
 *           a shadow.
 *
-* inputs  : pID - [in] pointer to a intDataT (see world.h) with the information of where the intersection took 
+* inputs  : pID - [in] pointer to a intDataT (see world.h) with the information of where the intersection took
 *                 place
 *
 * returns : color of the pixel.
@@ -322,6 +330,7 @@ void world::prepare(ray r, pIntDataT pID, int intNdx)
 */
 color world::shadeHit(pIntDataT pID, int remaining)
 {
+
     color    clrRet(0.0f, 0.0f, 0.0f);
 
     std::vector<light*>::iterator    iter = m_vecLights.begin();
@@ -335,7 +344,13 @@ color world::shadeHit(pIntDataT pID, int remaining)
     color reflected = reflectColor(pID, remaining);
     color refracted = refractColor(pID, remaining);
 
-    return clrRet + reflected +refracted;
+    //if ((pID->pObject->getMat()->reflect() > 0.0f) && (pID->pObject->getMat()->transpar() > 0.0f))
+    //{
+    //    float reflectance = schlick(pID);
+    //    return reflected * reflectance;// +refracted * (1.0f - reflectance);
+    //}
+
+    return clrRet + reflected + refracted;
 }
 
 /*
@@ -357,13 +372,13 @@ color world::reflectColor(pIntDataT pID, int remaining)
     float reflective = (pID->pObject)->getMat()->reflect();
     if (fabs(reflective) <= EPSILON)
         return retColor;
-    else if (remaining <= 0)
+    else if (remaining < 1)
         return retColor;
     else
     {
         ray reflectRay = ray(pID->overPt, pID->reflectv);
         retColor = intersect(reflectRay, (remaining-1));
-        retColor = reflective * retColor;
+        retColor = retColor*reflective;
 
         return retColor;
     }
@@ -388,24 +403,25 @@ color world::refractColor(pIntDataT pID, int remaining)
 
     float ratio = pID->n1 / pID->n2;                        // ratio of index of refraction
     float cosI = pID->normalv.dot(pID->eyev);               // cosine of incident angle
-    float sinR2 = ratio * ratio*(1 - cosI * cosI);          // sine of refracted angle, squared (sin^2A = 1 - cos^2A)
+    float sinT2 = (ratio * ratio)*(1 - (cosI * cosI));      // sine of refracted angle, squared (sin^2A = 1 - cos^2A)
 
 
     float transparent = (pID->pObject)->getMat()->transpar();
     if (fabs(transparent) <= EPSILON)                       // obaque material
         return retColor;
-    else if (remaining <= 0)                                // passed recursion depth
+    else if (remaining <1)                                // passed recursion depth
         return retColor;
-    else if (sinR2 > 1.0f)                                  // total internal reflection
+    else if (sinT2 > 1.0f)                                  // total internal reflection
         return retColor;
     else
     {
-        float cosR = sqrt((1 - sinR2));                              // cosine of refracted angle
-        vector dir = (cosI - cosR)*pID->normalv - ratio * pID->eyev;
+        float cosT = sqrt((1 - sinT2));                              // cosine of refracted angle
+        vector dir = (pID->normalv * ((ratio*cosI) - cosT)) - (pID->eyev * ratio);
+
         ray refractRay(pID->underPt, dir);
 
         retColor = intersect(refractRay, (remaining -1), -1);
-        retColor = transparent * retColor;
+        retColor = retColor * transparent;
 
         return retColor;
     }
@@ -537,7 +553,7 @@ bool world::intersectShadow(ray r, float d)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // these functions are hidden so we can only manipulate the world object the the m_pThis pointer
-world::world(color dclr) : m_nObjCnt(0), m_pID(nullptr), m_defaultColor(dclr)
+world::world(bool bDebug, color dclr) : m_nObjCnt(0), m_pID(nullptr), m_defaultColor(dclr), m_bDebug(bDebug)
 { }
 
 world::~world()

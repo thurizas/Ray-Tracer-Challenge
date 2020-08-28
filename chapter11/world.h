@@ -29,7 +29,7 @@ typedef struct _idintData
 class world
 {
 public:
-    static world* createWorld(color defColor = color(0.0f, 0.0f, 0.25f));
+    static world* createWorld(bool bDebug = false, color defColor = color(0.0f, 0.0f, 0.25f));
     static void   deleteWorld();
 
     void addLight(light*);
@@ -53,7 +53,7 @@ public:
     friend std::ostream& operator<<(std::ostream&, const intDataT);
 
 private:
-    world(color);
+    world(bool, color);
     ~world();
     world(const world& rhs);
     const world& operator=(const world& rhs);
@@ -73,6 +73,7 @@ private:
     color                                 m_defaultColor;
     //color                                 m_colors[3];       // colors for normal, reflected and refracted colors
     //int                                   m_maxRecursion;
+    bool                                  m_bDebug;
 };
 
 std::ostream& operator<<(std::ostream&, const intDataT);
