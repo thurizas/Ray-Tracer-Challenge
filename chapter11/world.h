@@ -45,8 +45,8 @@ public:
     color refractColor(pIntDataT, int);
     float schlick(pIntDataT);
     // testing functions
-    std::vector < std::pair<int, float>> getIntersections() { return m_vecIntersections; } // get intersections
-    pIntDataT getIntData() { return m_pID; }                                               // get data on an intersection 
+    //std::vector < std::pair<int, float>> getIntersections() { return m_vecIntersections; } // get intersections
+    //pIntDataT getIntData() { return m_pID; }                                               // get data on an intersection 
     //color*    getColors() { return m_colors; }           // get normal, reflected, refracted colors 
 
     friend std::ostream& operator<< (std::ostream&, const world&);
@@ -58,7 +58,7 @@ private:
     world(const world& rhs);
     const world& operator=(const world& rhs);
 
-    void prepare(ray, pIntDataT, int intNdx = -1);
+    void prepare(ray, pIntDataT, std::vector<std::pair<int, float>>*, int intNdx = -1);
     color shadeHit(pIntDataT, int);
     //color reflectColor(pIntDataT, int);
     //color refractColor(pIntDataT, int);

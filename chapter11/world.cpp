@@ -163,28 +163,25 @@ color world::intersect(ray r, int remaining, int intNdx)
 
     std::sort(vecIntersections.begin(), vecIntersections.end(), [](std::pair<int, float>lhs, std::pair<int, float> rhs) {return lhs.second < rhs.second;});
 
-     if (bret)
+    if (bret)
     {
-      int cnt = vecIntersections.size();
-      if(vecIntersections.at(cnt-1).second > 0) 
-      {
-        prepare(r, pID, &vecIntersections, intNdx);
+        int cnt = vecIntersections.size();
+        if(vecIntersections.at(cnt-1).second > 0) 
+        {
+            prepare(r, pID, &vecIntersections, intNdx);
+
+            if (m_bDebug) std::cout << "intersection number: " << intNdx << "\n" << *pID << std::endl;
         
-        if (m_bDebug) std::cout << *pID << std::endl;
-
-        /*color*/ objColor = shadeHit(pID, remaining);
-
-        //return objColor;
-      }
-      else
-      {
-	objColor = m_defaultColor;
-      }
+            objColor = shadeHit(pID, remaining);
+        }
+        else
+        {
+	        objColor = m_defaultColor;
+        }
     }
     else
     {
-      objColor = m_defaultColor;
-      //return m_defaultColor; 
+        objColor = m_defaultColor;
     }
 
     if(nullptr != pID) delete pID;
@@ -219,7 +216,7 @@ void world::prepare(ray r, pIntDataT pID, std::vector<std::pair<int,float>>* pIn
         unsigned int ndx;
         if (-1 == intNdx)                  // defalut value -- use the first positive intersection
         {
-	  for (ndx = 0; ndx < pInters->size(); ndx++)
+	        for (ndx = 0; ndx < pInters->size(); ndx++)
             {
                 if (pInters->at(ndx).second > 0)
                     break;
@@ -270,12 +267,7 @@ void world::prepare(ray r, pIntDataT pID, std::vector<std::pair<int,float>>* pIn
                 bContinue = false;   // got both sides of the intersection, exit
             }
         }
-	// TODO: have a case where ints are 2, -0.0145 and 2,-0.00282
-	// TODO: we get herer with out finding a match ndx is 2 and 
-	// TODO: cntIntersections is also 2 -- thus we get an 
-	// TODO: out of range exception on the following lines
-	// TODO: root cause is that intNdx is -1, and there are not positive
-	// TODO: `t' values ... thus ndx is set to an out of bounds number
+
         pID->ndx = ndx;
         pID->t = (pInters->at(ndx)).second;
         pID->id = (pInters->at(ndx)).first;
@@ -350,14 +342,17 @@ color world::shadeHit(pIntDataT pID, int remaining)
         iter++;
     }
 
-    color reflected = reflectColor(pID, remaining);
-    color refracted = refractColor(pID, remaining);
-
     //if ((pID->pObject->getMat()->reflect() > 0.0f) && (pID->pObject->getMat()->transpar() > 0.0f))
     //{
     //    float reflectance = schlick(pID);
     //    return reflected * reflectance;// +refracted * (1.0f - reflectance);
     //}
+
+    if (m_bDebug) std::cout << "The remaining: " << remaining << " base color is: " << clrRet << std::endl;
+    color reflected = reflectColor(pID, remaining);
+    if(m_bDebug) std::cout << "The remaining: " << remaining << " reflected color is: " << reflected << std::endl;
+    color refracted = refractColor(pID, remaining);
+    if (m_bDebug) std::cout << "The remaining: " << remaining << "refracted color is: " << refracted << std::endl;
 
     return clrRet + reflected + refracted;
 }
@@ -483,7 +478,6 @@ bool world::isShadowed(point pt, light* l)
 
     ray shadowR(pt, direction);
     return intersectShadow(shadowR, distance);
-
 }
 
 

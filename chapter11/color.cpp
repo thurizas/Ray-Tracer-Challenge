@@ -118,11 +118,17 @@ color operator*(int v, const color& c)
 
     return color(comp[0], comp[1], comp[2]);
 }
-
+/*
+    os << "( " << (fabs(const_cast<point&>(v).x()) < EPSILON ? 0 : const_cast<point&>(v).x()) << ", ";
+    os << (fabs(const_cast<point&>(v).y()) < EPSILON ? 0 : const_cast<point&>(v).y()) << ", ";
+    os << (fabs(const_cast<point&>(v).z()) < EPSILON ? 0 : const_cast<point&>(v).z()) << ", ";
+    os << (fabs(const_cast<point&>(v).w()) < EPSILON ? 0 : const_cast<point&>(v).w()) << ")";
+    return os;
+*/
 std::ostream &operator<<(std::ostream &os, const color& c) 
 {
-    os << "( " << const_cast<color&>(c).r() << ", ";
-    os << const_cast<color&>(c).g() << ", ";
-    os << const_cast<color&>(c).b() << ")";
+    os << "( " << (fabs(const_cast<color&>(c).r()) < EPSILON ? 0 : const_cast<color&>(c).r()) << ", ";
+    os << (fabs(const_cast<color&>(c).g()) < EPSILON ? 0 : const_cast<color&>(c).g()) << ", ";
+    os << (fabs(const_cast<color&>(c).b()) < EPSILON ? 0 : const_cast<color&>(c).b()) << ")";
     return os;
 }

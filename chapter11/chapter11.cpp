@@ -21,37 +21,37 @@
 
 
 
-void reflectionTest1();             // material modification
-void reflectionTest2();             // compute the reflectv vector
-void reflectionTest3();             // color striking a non-reflective surface
-void reflectionTest4();             // color striking a reflective surface
-void reflectionTest5();             // update shadeHit cal'cs
-void reflectionTest6();             // testing for unbounded recursion
-void reflectionTest7();             // bounding reflection recursion
+void reflectionTest1(bool flag = false);    // material modification
+void reflectionTest2(bool flag = false);    // compute the reflectv vector
+void reflectionTest3(bool flag = false);    // color striking a non-reflective surface
+void reflectionTest4(bool flag = false);    // color striking a reflective surface
+void reflectionTest5(bool flag = false);    // update shadeHit cal'cs
+void reflectionTest6(bool flag = false);    // testing for unbounded recursion
+void reflectionTest7(bool flag = false);    // bounding reflection recursion
 
-void refractionTest1();             // material modification and def. of glass sphere
-void refractionTest2();             // n1 and n2 at intersection points
-void refractionTest3();             // calculation of under-point
-void refractionTest4();             // color for refracted ray with opaque material
-void refractionTest5();             // color at limit of recursion
-void refractionTest6();             // test for internal reflection      
-void refractionTest7();             // refracted color with refracted ray
-void refractionTest8();             // shadeHit cal'cs correct color
+void refractionTest1(bool flag = false);    // material modification and def. of glass sphere
+void refractionTest2(bool flag = false);    // n1 and n2 at intersection points
+void refractionTest3(bool flag = false);    // calculation of under-point
+void refractionTest4(bool flag = false);    // color for refracted ray with opaque material
+void refractionTest5(bool flag = false);    // color at limit of recursion
+void refractionTest6(bool flag = false);    // test for internal reflection      
+void refractionTest7(bool flag = false);    // refracted color with refracted ray
+void refractionTest8(bool flag = false);    // shadeHit cal'cs correct color
 
-void fresnelTest1();                // reflectance under total internal reflectance
-void fresnelTest2();                // ray hits surface at 90 degree angle
-void fresnelTest3();                // n2 > n1 and angle is small
-void fresnetTest4();                // shadeHit cal'cs correct
+void fresnelTest1(bool flag = false);       // reflectance under total internal reflectance
+void fresnelTest2(bool flag = false);       // ray hits surface at 90 degree angle
+void fresnelTest3(bool flag = false);       // n2 > n1 and angle is small
+void fresnetTest4(bool flag = false);       // shadeHit cal'cs correct
 
 void reflectionTest(int, int);
 void refractionTest(int, int);
 void mainTest(int, int);
 
-bool g_bDebug;
 
 int main(int argc, char** argv)
 {
     int choice;
+    bool   bDebug;
     int width = 640;
     int height = 400;
 
@@ -68,41 +68,41 @@ int main(int argc, char** argv)
             break;
 
         case 'd':
-            g_bDebug = true;
+            bDebug = true;
 
         default:
             ;
         }
     }
 
-    //reflectionTest1();                            //1. material modification
-    //reflectionTest2();                            //2. compute the reflectv vector
-    //reflectionTest3();                            //3. color striking a non-reflective surface
-    //reflectionTest4();                            //4. color striking a reflective surface - test5 will casue this to fail
-    //reflectionTest5();                            //5. update shadeHit cal'cs
-    //reflectionTest6();                            //6. avoid infinite recursion
-    //reflectionTest7();                            //7. limiting depth of recursion
+    //reflectionTest1(bDebug);                            
+    //reflectionTest2(bDebug);                            
+    //reflectionTest3(bDebug);                            
+    //reflectionTest4(bDebug); // test5 will casue this to fail
+    //reflectionTest5(bDebug);                            
+    //reflectionTest6(bDebug);                            
+    //reflectionTest7(bDebug);                            
 
-    //refractionTest1();                            // material modification and def. of glass sphere
-    //refractionTest2();                            // n1 and n2 at intersection points
-    //refractionTest3();                            // calculation of under-point
-    //refractionTest4();                            // color for refracted ray with opaque material
-    //refractionTest5();                            // color at limit of recurrsion
-    //refractionTest6();                            // test for internal reflection      
-    //refractionTest7();                            // refracted color with refracted ray
-    //refractionTest8();                            // shadeHit cal'cs correct color
+    //refractionTest1(bDebug);                            
+    //refractionTest2(bDebug);                            
+    //refractionTest3(bDebug);                            
+    //refractionTest4(bDebug);                            
+    //refractionTest5(bDebug);                            
+    //refractionTest6(bDebug);                            
+    //refractionTest7(bDebug);                            
+    refractionTest8(bDebug);          // shadeHit cal'cs correct color
 
-    //fresnelTest1();                                 // reflectance under total internal reflectance
-    //fresnelTest2();                                 // ray hits surface at 90 degree angle
-    //fresnelTest3();                                 // n2 > n1 and angle is small
-    //fresnetTest4();                                 // shadeHit cal'cs correct
+    //fresnelTest1(g_bDebug);                                 
+    //fresnelTest2(g_bDebug);                                 
+    //fresnelTest3(g_bDebug);                                 
+    //fresnetTest4(g_bDebug);                                 
 
     //reflectionTest(width, height);                // main reflection test
-    refractionTest(width, height);                // main refraction test
+    //refractionTest(width, height);                // main refraction test
     //mainTest(width, height);
 }
 
-void reflectionTest1()
+void reflectionTest1(bool flag)
 {
     // features/material.features - reflectivity for the default material
     material m;                                                          // default material
@@ -110,7 +110,7 @@ void reflectionTest1()
     std::cout << "default material is: \n" << m << std::endl;
 }
 
-void reflectionTest2()
+void reflectionTest2(bool flag)
 {
     // features/intersections.feature - precomputation of reflection vector
     world* pW = world::createWorld();
@@ -126,7 +126,7 @@ void reflectionTest2()
     world::deleteWorld();
 }
 
-void reflectionTest3()
+void reflectionTest3(bool flag)
 {
     world* pW = defaultWorld();
     pW->getObject(1)->getMat()->a(1.0);
@@ -141,7 +141,7 @@ void reflectionTest3()
 
 // N.B.  This test will fail once reflectionTest5 is working
 //       shadeHit now calls refectColor
-void reflectionTest4()
+void reflectionTest4(bool flag)
 {
     // features/world.features - reflected color for a reflective material
     world* pW = defaultWorld();
@@ -165,7 +165,7 @@ void reflectionTest4()
     world::deleteWorld();
 }
 
-void reflectionTest5()
+void reflectionTest5(bool flag)
 {
     world* pw1 = defaultWorld();
     
@@ -186,7 +186,7 @@ void reflectionTest5()
 
 // N.B. This test should fail with stack overflow
 //      Once test 7 is working, this should succeeded.
-void reflectionTest6()
+void reflectionTest6(bool flag)
 {
     world* pW = world::createWorld();
 
@@ -210,7 +210,7 @@ void reflectionTest6()
     world::deleteWorld();
 }
 
-void reflectionTest7()
+void reflectionTest7(bool flag)
 {
     world* pw1 = defaultWorld();
 
@@ -235,7 +235,7 @@ void reflectionTest7()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // refraction unit tests....
-void refractionTest1()
+void refractionTest1(bool flag)
 {
     std::cout << "\n*** test #1 ************************" << std::endl;
     // test #1 - features / material.features - trasparency and refractive index for the default material
@@ -248,7 +248,7 @@ void refractionTest1()
     delete pS;
 }
 
-void refractionTest2()
+void refractionTest2(bool flag)
 {
     // test #2 - features / intersections.features -- finding n_1 and n_2 at intersection points.
     world* w = world::createWorld();
@@ -274,7 +274,7 @@ void refractionTest2()
     world::deleteWorld();
 }
 
-void refractionTest3()
+void refractionTest3(bool flag)
 {
     // test #3 - feature/intersection.features - under point is offset below surface
     world* w1 = world::createWorld();
@@ -292,7 +292,7 @@ void refractionTest3()
     world::deleteWorld();
 }
 
-void refractionTest4()
+void refractionTest4(bool flag)
 {
     // test #4 - features/world.feature - the refracted color of an opaque surface is black
     world* w2 = defaultWorld();
@@ -306,7 +306,7 @@ void refractionTest4()
     world::deleteWorld();
 }
 
-void refractionTest5()
+void refractionTest5(bool flag)
 {
     // test #5 - features/world.feature - the refracted color at maximum recursive depth
     world* pW = defaultWorld();
@@ -322,7 +322,7 @@ void refractionTest5()
     world::deleteWorld();
 }
 
-void refractionTest6()
+void refractionTest6(bool flag)
 {
     // test #6 - features/world.feature - the refracted color under total internal reflection
     world* pW = defaultWorld();
@@ -340,10 +340,10 @@ void refractionTest6()
 }
 
 // TODO : check defPattern is working correctly, check refracted direction and intersection point.
-void refractionTest7()
+void refractionTest7(bool flag)
 {
     // test #7 - features/world.feature - the refracted color with a refracted ray
-    world* pW = defaultWorld(g_bDebug);
+    world* pW = defaultWorld(flag);
     pW->getObject(1)->getMat()->a(1.0f);
     pW->getObject(1)->getMat()->p(new defPattern());   
     pW->getObject(2)->getMat()->transpar(1.0);
@@ -357,7 +357,7 @@ void refractionTest7()
     world::deleteWorld();
 }
 
-void refractionTest8()
+void refractionTest8(bool flag)
 {
     // test #8 - features/world.feature - shade_hit() with a transparent material
     world* pW = defaultWorld(true);
