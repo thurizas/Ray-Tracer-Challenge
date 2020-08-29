@@ -54,7 +54,6 @@ int main(int argc, char** argv)
     int choice;
     int width = 640;
     int height = 400;
-    bool g_bDebug = false;
 
     while (-1 != (choice = getopt(argc, argv, "w:h:d")))
     {
@@ -98,7 +97,7 @@ int main(int argc, char** argv)
     //fresnelTest3();                                 // n2 > n1 and angle is small
     //fresnetTest4();                                 // shadeHit cal'cs correct
 
-    reflectionTest(width, height);                // main reflection test
+    //reflectionTest(width, height);                // main reflection test
     refractionTest(width, height);                // main refraction test
     //mainTest(width, height);
 }
@@ -121,15 +120,8 @@ void reflectionTest2()
 
     ray r(point(0.0f, 1.0f, -1.0f), vector(0, -(float)sqrt(2) / 2.0f, (float)sqrt(2) / 2.0f));
     pW->intersect(r);
-    std::vector<std::pair<int, float>> inters = pW->getIntersections();
-    std::cout << "\n\n*** test #2 :  ************************" << std::endl;
-    std::cout << "The intersections are: " << std::endl;
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << std::endl;
-    }
-    pIntDataT pID = pW->getIntData();
-    std::cout << "reflected normal is [0, 0.707, 0.707]: " << pID->reflectv << std::endl;
+ 
+    //std::cout << "reflected normal is [0, 0.707, 0.707]: " << pID->reflectv << std::endl;
 
     world::deleteWorld();
 }
@@ -142,16 +134,7 @@ void reflectionTest3()
     pW->intersect(r,3);                       // use a specific intersection for test
     
     std::cout << "\n*** test #3 :  ************************" << std::endl;
-    std::cout << "The intersections are:" << std::endl;
-    std::vector<std::pair<int, float>> inters = pW->getIntersections();
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << std::endl;
-    }
-    pIntDataT pID = pW->getIntData();
-    std::cout << *pID << std::endl;
-    
-    std::cout << "the reflected color is (0, 0, 0): " << pW->reflectColor(pID, 0) << std::endl;
+    //std::cout << "the reflected color is (0, 0, 0): " << pW->reflectColor(pID, 0) << std::endl;
 
     world::deleteWorld();
 }
@@ -175,16 +158,8 @@ void reflectionTest4()
 
     std::cout << "\n*** test #4 :  ************************" << std::endl;
     std::cout << "the world is: \n" << *pW << std::endl;
-    std::cout << "the intersections are: " << std::endl;
-    std::vector<std::pair<int, float>> inters = pW->getIntersections();
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << ", " << std::endl;
-    }
-    pIntDataT pID = pW->getIntData();
-    std::cout << *pID << std::endl;
-
-    std::cout << "the reflected color is (0.19032, 0.2379, 0.14274) : " << pW->reflectColor(pID, 0) << std::endl;
+    
+    //std::cout << "the reflected color is (0.19032, 0.2379, 0.14274) : " << pW->reflectColor(pID, 0) << std::endl;
 
 
     world::deleteWorld();
@@ -205,13 +180,7 @@ void reflectionTest5()
     color pixel = pw1->intersect(r2);
 
     std::cout << "\n*** test #5 :  ************************" << std::endl;;
-    std::cout << "the intersections are: " << std::endl;;
-    std::vector<std::pair<int, float>> inters = pw1->getIntersections();
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << ", " << std::endl;;
-    }
-    std::cout << "the reflected color is (0.87677, 0.92436, 0.82918): " << pixel << std::endl;
+    
     world::deleteWorld();
 }
 
@@ -256,14 +225,8 @@ void reflectionTest7()
     pw1->intersect(r2);
 
     std::cout << "\n*** test #7 :  ************************" << std::endl;;
-    std::cout << "the intersections are: " << std::endl;;
-    std::vector<std::pair<int, float>> inters = pw1->getIntersections();
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << ", " << std::endl;;
-    }
-    pIntDataT pID = pw1->getIntData();
-    std::cout << "the reflected color is (0, 0, 0): " << pw1->reflectColor(pID, 0) << std::endl;
+    
+    //std::cout << "the reflected color is (0, 0, 0): " << pw1->reflectColor(pID, 0) << std::endl;
     world::deleteWorld();
 
 }
@@ -305,22 +268,6 @@ void refractionTest2()
     w->addObject(pS2);
     w->addObject(pS3);
 
-    std::cout << "\n*** test #2 ************************" << std::endl;
-
-    ray r1(point(0.0f, 0.0f, -4.0f), vector(0.0f, 0.0f, 1.0f));
-    std::cout << "intersections are at [2, 2.75, 3.25, 4.75, 5.25, 6]:" << std::endl;
-    printf("%3s\t%3s\t%8s\t%8s\t%8s\n","ndx", "obj", "---t----", "---n1---", "---n2---");
-    for (int ndx = 0; ndx < 6; ndx++)
-    {
-        w->intersect(r1, 5, ndx);
-        pIntDataT pID = w->getIntData();
-        if (nullptr != pID)
-        {
-            int objId = pID->pObject->getID();
-            printf("%3d\t%3d\t%6.2f\t       %6.2f\t        %6.2f\n", ndx, objId, pID->t, pID->n1, pID->n2);
-        }
-    }
-
     delete pS1;
     delete pS2;
     delete pS3;
@@ -341,15 +288,6 @@ void refractionTest3()
     std::cout << "\n*** test #3 ************************" << std::endl;
 
     w1->intersect(r2);
-    std::cout << "intersections are at [5, 7]:";
-    std::vector<std::pair<int, float>> ints = w1->getIntersections();
-    for (auto inter : ints)
-    {
-        std::cout << inter.second << ":" << inter.first << ", ";
-    }
-    std::cout << std::endl;
-    pIntDataT  pID = w1->getIntData();
-    std::cout << "precomputed intersection data:\n" << *pID << std::endl;
 
     world::deleteWorld();
 }
@@ -362,14 +300,8 @@ void refractionTest4()
 
     std::cout << "\n*** test #4 ************************" << std::endl;
     w2->intersect(r3);
-    std::vector<std::pair<int, float>> inters = w2->getIntersections();
-    std::cout << "intersections at (4:1, 4.5:2, 5.5:2, 6:1): \n";
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << ", ";
-    }
-    pIntDataT pID = w2->getIntData();
-    std::cout << "\nrefracted color is (0,0,0): " << w2->refractColor(pID, 5) << std::endl;
+ 
+    //std::cout << "\nrefracted color is (0,0,0): " << w2->refractColor(pID, 5) << std::endl;
 
     world::deleteWorld();
 }
@@ -384,14 +316,8 @@ void refractionTest5()
     ray r(point(0.0f, 0.0f, -5.0f), vector(0.0f, 0.0f, 1.0f));
     pW->intersect(r);
     std::cout << "\n*** test #5 ************************" << std::endl;
-    std::cout << "intersections at (4:1, 4.5:2, 5.5:2, 6:1):" << std::endl;
-    std::vector<std::pair<int, float>> inters = pW->getIntersections();
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << ", ";
-    }
-    pIntDataT pID = pW->getIntData();
-    std::cout << "\nthe refracted color is (0,0,0): " << pW->refractColor(pID, 0) << std::endl;
+ 
+    //std::cout << "\nthe refracted color is (0,0,0): " << pW->refractColor(pID, 0) << std::endl;
 
     world::deleteWorld();
 }
@@ -407,14 +333,8 @@ void refractionTest6()
     pW->intersect(r);
 
     std::cout << "\n*** test #6 ************************" << std::endl;
-    std::cout << "The intersections (-0.70711:1, 0.70711:1):" << std::endl;
-    std::vector<std::pair<int, float>> inters = pW->getIntersections();
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << ", ";
-    }
-    pIntDataT pID = pW->getIntData();
-    std::cout << "\nthe refracted color is (0, 0, 0):" << pW->refractColor(pID, 5) << std::endl;
+ 
+    //std::cout << "\nthe refracted color is (0, 0, 0):" << pW->refractColor(pID, 5) << std::endl;
     
     world::deleteWorld();
 }
@@ -433,15 +353,7 @@ void refractionTest7()
     pW->intersect(r);
 
     std::cout << "\n*** test #7 ************************" << std::endl;
-    std::cout << "the intersections are [-0.9950:0, -0.4899:1, 0.4899:1, 0.9950:0] : " << std::endl;
-    std::vector<std::pair<int, float>> inters = pW->getIntersections();
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << ", ";
-    }
-    pIntDataT pID = pW->getIntData();
-    std::cout << "\nThe refracted color (0, 0.99888, 0.04725) is: " << pW->refractColor(pID, 5) << std::endl;
-
+ 
     world::deleteWorld();
 }
 
@@ -469,11 +381,7 @@ void refractionTest8()
     std::cout << "\n*** test #8 ************************" << std::endl;
     std::cout << "intersections are (1.41421:3) : " << std::endl;
     std::cout << "intersections are (1.92237:4) : " << std::endl;
-    std::vector < std::pair<int, float>> inters = pW->getIntersections();
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << std::endl;
-    }
+
     std::cout << "\n The final color is (0.93642, 0.68642, 0.68642): " << cl << std::endl;
 }
 
@@ -492,16 +400,8 @@ void fresnelTest1()
     pW->intersect(r);
 
     std::cout << "\n*** test #1 ************************" << std::endl;
-    std::cout << "intersections are: " << std::endl;
-    std::vector < std::pair<int, float>> inters = pW->getIntersections();
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << std::endl;
-    }
-
-    pIntDataT pID = pW->getIntData();
-    float     reflectance = pW->schlick(pID);
-    std::cout << "\n The reflectance is: (1.0)" << reflectance << std::endl;
+    //float     reflectance = pW->schlick(pID);
+    //std::cout << "\n The reflectance is: (1.0)" << reflectance << std::endl;
     std::cout << "\n*************************************" << std::endl;
 
     world::deleteWorld();
@@ -519,16 +419,9 @@ void fresnelTest2()
 
     pW->intersect(r);
 
-    std::cout << "intersections are: " << std::endl;
-    std::vector < std::pair<int, float>> inters = pW->getIntersections();
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << std::endl;
-    }
 
-    pIntDataT pID = pW->getIntData();
-    float     reflectance = pW->schlick(pID);
-    std::cout << "\n The reflectance is (0.04): " << reflectance << std::endl;
+    //float     reflectance = pW->schlick(pID);
+    //std::cout << "\n The reflectance is (0.04): " << reflectance << std::endl;
     std::cout << "\n*************************************" << std::endl;
 
     world::deleteWorld();
@@ -546,16 +439,8 @@ void fresnelTest3()
 
     pW->intersect(r);
 
-    std::cout << "intersections are: " << std::endl;
-    std::vector < std::pair<int, float>> inters = pW->getIntersections();
-    for (auto inter : inters)
-    {
-        std::cout << inter.second << ":" << inter.first << std::endl;
-    }
-
-    pIntDataT pID = pW->getIntData();
-    float     reflectance = pW->schlick(pID);
-    std::cout << "\n The reflectance is (0.48873): " << reflectance << std::endl;
+    //float     reflectance = pW->schlick(pID);
+    //std::cout << "\n The reflectance is (0.48873): " << reflectance << std::endl;
     std::cout << "\n*************************************" << std::endl;
 
     world::deleteWorld();
@@ -627,6 +512,8 @@ void reflectionTest(int width, int height)
     c.render(w, &i);
 
     i.writePPM("./chapter11a.ppm");
+
+    world::deleteWorld();
 }
 
 void refractionTest(int width, int height)
@@ -763,6 +650,8 @@ void mainTest(int width, int height)
     c.render(w, &i);
 
     i.writePPM("./chapter11c.ppm");
+
+    world::deleteWorld();
 }
 
 

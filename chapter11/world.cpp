@@ -105,17 +105,14 @@ object* world::getObject(unsigned int ndx)
 color world::intersect(ray r, int remaining, int intNdx)
 {
     bool bret = false;
+    pIntDataT   pID = nullptr;
+    color    objColor = m_defaultColor;
+
+    std::vector<std::pair<int, float>> vecIntersections;
+
+    pID = new intDataT;
     if (m_bDebug) std::cout << "\nRecursion count " << remaining << " Using ray: " << r << std::endl;
 
-    if (m_vecIntersections.size() > 0)             // delete any old intersections, if any
-    {
-        m_vecIntersections.erase(m_vecIntersections.begin(), m_vecIntersections.end());
-    }
-
-    if (nullptr != m_pID)                           // delete any old intersection data, if needed
-        delete m_pID;
-
-    m_pID = new intDataT;                           // create a new intersection data structure
 
     if (m_mapObjects.size() > 0)                    // we have objects to work with
     {
@@ -130,8 +127,8 @@ color world::intersect(ray r, int remaining, int intNdx)
                 if (pSphere->intersect(r, &intInfo))
                 {
                     if (m_bDebug) std::cout << "hit sphere " << (*iter).second->getID() << std::endl;
-                    m_vecIntersections.push_back(std::pair<int, float>(pSphere->getID(), intInfo.t1()));
-                    m_vecIntersections.push_back(std::pair<int, float>(pSphere->getID(), intInfo.t2()));
+                    vecIntersections.push_back(std::pair<int, float>(pSphere->getID(), intInfo.t1()));
+                    vecIntersections.push_back(std::pair<int, float>(pSphere->getID(), intInfo.t2()));
 
                     bret = true;
                 }
@@ -142,7 +139,7 @@ color world::intersect(ray r, int remaining, int intNdx)
                 if (pPlane->intersect(r, &intInfo))
                 {
                     if (m_bDebug) std::cout << "hit plane " << (*iter).second->getID() << std::endl;
-                    m_vecIntersections.push_back(std::pair<int, float>(pPlane->getID(), intInfo.t1()));
+                    vecIntersections.push_back(std::pair<int, float>(pPlane->getID(), intInfo.t1()));
                     bret = true;
                 }
             }
@@ -157,30 +154,41 @@ color world::intersect(ray r, int remaining, int intNdx)
 
     if (m_bDebug)
     {
-        for (auto inter : m_vecIntersections)
+        for (auto inter : vecIntersections)
         {
             std::cout << inter.second << ":" << inter.first << ", ";
         }
         std::cout << std::endl;
     }
 
+    std::sort(vecIntersections.begin(), vecIntersections.end(), [](std::pair<int, float>lhs, std::pair<int, float> rhs) {return lhs.second < rhs.second;});
 
-    if (bret)
+     if (bret)
     {
-        std::sort(m_vecIntersections.begin(), m_vecIntersections.end(), [](std::pair<int, float>lhs, std::pair<int, float> rhs) {return lhs.second < rhs.second;});
-
-        prepare(r, m_pID, intNdx);
+      int cnt = vecIntersections.size();
+      if(vecIntersections.at(cnt-1).second > 0) 
+      {
+        prepare(r, pID, &vecIntersections, intNdx);
         
-        if (m_bDebug) std::cout << *m_pID << std::endl;
+        if (m_bDebug) std::cout << *pID << std::endl;
 
-        color objColor = shadeHit(m_pID, remaining);
+        /*color*/ objColor = shadeHit(pID, remaining);
 
-        return objColor;
+        //return objColor;
+      }
+      else
+      {
+	objColor = m_defaultColor;
+      }
     }
     else
     {
-        return m_defaultColor; 
+      objColor = m_defaultColor;
+      //return m_defaultColor; 
     }
+
+    if(nullptr != pID) delete pID;
+    return objColor;
 }
 
 
@@ -202,18 +210,18 @@ color world::intersect(ray r, int remaining, int intNdx)
 *
 * written : (7/29/2020)
 */
-void world::prepare(ray r, pIntDataT pID, int intNdx)
+void world::prepare(ray r, pIntDataT pID, std::vector<std::pair<int,float>>* pInters, int intNdx)
 {
-    int cntIntersections = m_vecIntersections.size();
+    int cntIntersections = pInters->size();
 
     if (nullptr != pID)
     {
         unsigned int ndx;
         if (-1 == intNdx)                  // defalut value -- use the first positive intersection
         {
-            for (ndx = 0; ndx < m_vecIntersections.size(); ndx++)
+	  for (ndx = 0; ndx < pInters->size(); ndx++)
             {
-                if (m_vecIntersections.at(ndx).second > 0)
+                if (pInters->at(ndx).second > 0)
                     break;
             }
         }
@@ -227,7 +235,7 @@ void world::prepare(ray r, pIntDataT pID, int intNdx)
         bool bContinue = true;
 
         for (int ints = 0; ints < cntIntersections && bContinue; ints++)
-        {        
+        { 
             std::vector<int>::iterator  iter;
             if (ints == ndx)                  // our intersection is the one we are looking at
             {
@@ -241,13 +249,13 @@ void world::prepare(ray r, pIntDataT pID, int intNdx)
                 }
             }
 
-            if (vecObjects.end() != (iter = std::find(vecObjects.begin(), vecObjects.end(), m_vecIntersections.at(ints).first)))
+            if (vecObjects.end() != (iter = std::find(vecObjects.begin(), vecObjects.end(), pInters->at(ints).first)))
             {
                 vecObjects.erase(iter);
             }
             else
             {
-                vecObjects.push_back(m_vecIntersections.at(ints).first);
+                vecObjects.push_back(pInters->at(ints).first);
             }
 
             if(ints == ndx)
@@ -262,10 +270,15 @@ void world::prepare(ray r, pIntDataT pID, int intNdx)
                 bContinue = false;   // got both sides of the intersection, exit
             }
         }
-
+	// TODO: have a case where ints are 2, -0.0145 and 2,-0.00282
+	// TODO: we get herer with out finding a match ndx is 2 and 
+	// TODO: cntIntersections is also 2 -- thus we get an 
+	// TODO: out of range exception on the following lines
+	// TODO: root cause is that intNdx is -1, and there are not positive
+	// TODO: `t' values ... thus ndx is set to an out of bounds number
         pID->ndx = ndx;
-        pID->t = (m_vecIntersections.at(ndx)).second;
-        pID->id = (m_vecIntersections.at(ndx)).first;
+        pID->t = (pInters->at(ndx)).second;
+        pID->id = (pInters->at(ndx)).first;
         pID->inside = false;
         pID->inShadow = false;
 
@@ -289,8 +302,6 @@ void world::prepare(ray r, pIntDataT pID, int intNdx)
                 pID->overPt = pID->pt + pID->normalv*EPSILON;
                 pID->underPt = pID->pt - pID->normalv*EPSILON;
                 pID->reflectv = r.direction().reflect(pID->normalv);
-
-
             }
             else if (PLANE == (o)->getType())
             {
@@ -303,8 +314,6 @@ void world::prepare(ray r, pIntDataT pID, int intNdx)
                 pID->overPt = pID->pt + pID->normalv*EPSILON;
                 pID->underPt = pID->pt - pID->normalv*EPSILON;
                 pID->reflectv = r.direction().reflect(pID->normalv);
-
-
             }
             else
             {
@@ -553,7 +562,7 @@ bool world::intersectShadow(ray r, float d)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // these functions are hidden so we can only manipulate the world object the the m_pThis pointer
-world::world(bool bDebug, color dclr) : m_nObjCnt(0), m_pID(nullptr), m_defaultColor(dclr), m_bDebug(bDebug)
+world::world(bool bDebug, color dclr) : m_nObjCnt(0), /*m_pID(nullptr),*/ m_defaultColor(dclr), m_bDebug(bDebug)
 { }
 
 world::~world()
