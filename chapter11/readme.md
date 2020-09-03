@@ -10,4 +10,4 @@ The following image is produced with no reflection or refraction enabled.
 ![Chapter10a](https://github.com/thurizas/Ray-Tracer-Challenge/blob/master/images/chapter10a.png)
 
 This image is produced with reflections (but not refractions) enabled.
-![Chapter11a)(https://github.com/thurizas/Ray-Tracer-Challenge/blob/master/images/chapter11a.ppm)
+![Chapter11a](https://github.com/thurizas/Ray-Tracer-Challenge/blob/master/images/chapter11a.ppm)
