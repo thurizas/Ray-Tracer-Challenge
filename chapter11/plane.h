@@ -11,7 +11,9 @@ class plane : public object
 {
 public:
     plane(material* pm = new material, unsigned short t = PLANE) : object(pm, t), m_ptCenter(0,0,0), m_vecNormal(0,1,0), m_matXform(m_xform)
-    { }
+  { }
+
+  ~plane() {if(m_pMat != nullptr) { delete m_pMat; m_pMat = nullptr;}}
 
     point getCenter() { return m_ptCenter; }
     vector getNormal() { return m_vecNormal; }
