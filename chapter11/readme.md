@@ -7,4 +7,7 @@ Chapter 11 adds reflection and refraction support to objects.  This is
 done by adding additional components to the material class.
 
 The following image is produced with no reflection or refraction enabled.
-![Chapter10a](Q:/Projects/RayTraceChallenge/images/chapter10a.png)
+![Chapter10a](https://github.com/thurizas/Ray-Tracer-Challenge/blob/master/images/chapter10a.png)
+
+This image is produced with reflections (but not refractions) enabled.
+![Chapter11a)(https://github.com/thurizas/Ray-Tracer-Challenge/blob/master/images/chapter11a.ppm)
