@@ -90,14 +90,14 @@ int main(int argc, char** argv)
     //refractionTest5(bDebug);                            
     //refractionTest6(bDebug);                            
     //refractionTest7(bDebug);                            
-    refractionTest8(bDebug);          // shadeHit cal'cs correct color
+    //refractionTest8(bDebug);          // shadeHit cal'cs correct color
 
     //fresnelTest1(g_bDebug);                                 
     //fresnelTest2(g_bDebug);                                 
     //fresnelTest3(g_bDebug);                                 
     //fresnetTest4(g_bDebug);                                 
 
-    //reflectionTest(width, height);                // main reflection test
+    reflectionTest(width, height);                // main reflection test
     //refractionTest(width, height);                // main refraction test
     //mainTest(width, height);
 }
@@ -167,7 +167,7 @@ void reflectionTest4(bool flag)
 
 void reflectionTest5(bool flag)
 {
-    world* pw1 = defaultWorld(true);
+    world* pw1 = defaultWorld();
     
     plane pl;
     material* pmat1 = pl.getMat();
@@ -177,9 +177,9 @@ void reflectionTest5(bool flag)
     pw1->addObject(&pl);
 
     ray r2(point(0, 0, -3.0f), vector(0, -(float)sqrt(2) / 2.0f, (float)sqrt(2) / 2.0f));
+    color pixel = pw1->intersect(r2);
 
-
-    std::cout << "\n*** test #5 :  ************************" << std::endl;
+    std::cout << "\n*** test #5 :  ************************" << std::endl;;
     
     world::deleteWorld();
 }
@@ -205,8 +205,7 @@ void reflectionTest6(bool flag)
     pW->addObject(&p2);
 
     ray r1(point(0, 0, 0), vector(0, 1, 0));
-    
-	std::cout << "\n*** test #5 :  ************************" << std::endl;
+    color pixed = pW->intersect(r1);
 
     world::deleteWorld();
 }
@@ -361,7 +360,7 @@ void refractionTest7(bool flag)
 void refractionTest8(bool flag)
 {
     // test #8 - features/world.feature - shade_hit() with a transparent material
-    world* pW = defaultWorld(true);
+    world* pW = defaultWorld(flag);
 
     plane floor;
     floor.xform(translation(0.0, -1.0f, 0.0));

@@ -7,15 +7,16 @@
 #include "point.h"
 
 #include <iostream>
+#include <iomanip>
 
 #define MAKENDX(r,c,w) (r)*(w) + (c)
 
 const int size = 4;
 const int size2 = 16;
 
-matrix4x4::matrix4x4() : m_nRows(size), m_nCols(size), m_a(nullptr)
+matrix4x4::matrix4x4() : m_nRows(size), m_nCols(size)//, m_a(nullptr)
 {
-    m_a = new float[size2];
+    //m_a = new float[size2];
     for (int ndx = 0; ndx < size2; ndx++)
         m_a[ndx] = 0.0f;
 }
@@ -23,9 +24,9 @@ matrix4x4::matrix4x4() : m_nRows(size), m_nCols(size), m_a(nullptr)
 matrix4x4::matrix4x4(float a, float b, float c, float d,
                      float e, float f, float g, float h,
                      float i, float j, float k, float l,
-                     float m, float n, float o, float p) : m_nRows(size), m_nCols(size), m_a(nullptr)
+                     float m, float n, float o, float p) : m_nRows(size), m_nCols(size)//, m_a(nullptr)
 {
-    m_a = new float[size2];
+    //m_a = new float[size2];
     m_a[0] = a;     m_a[1] = b;    m_a[2] = c;   m_a[3] = d;     
     m_a[4] = e;     m_a[5] = f;    m_a[6] = g;   m_a[7] = h;
     m_a[8] = i;     m_a[9] = j;    m_a[10] = k;  m_a[11] = l;
@@ -37,7 +38,7 @@ matrix4x4::matrix4x4(const matrix4x4& rhs)
     m_nRows = rhs.m_nRows;
     m_nCols = rhs.m_nCols;
 
-    m_a = new float[size2];
+    //m_a = new float[size2];
     for (int ndx = 0; ndx < size2; ndx++)
     {
         m_a[ndx] = rhs.m_a[ndx];
@@ -50,7 +51,7 @@ matrix4x4 matrix4x4::operator=(const matrix4x4& rhs)
     {
         m_nRows = rhs.m_nRows;
         m_nCols = rhs.m_nCols;
-        m_a = new float[size2];
+        //m_a = new float[size2];
         for (int ndx = 0; ndx < size2; ndx++)
         {
             m_a[ndx] = rhs.m_a[ndx];
@@ -61,11 +62,11 @@ matrix4x4 matrix4x4::operator=(const matrix4x4& rhs)
 }
 matrix4x4::~matrix4x4()
 {
-    if (m_a != nullptr)
-    {
-        delete[] m_a;
-        m_a = nullptr;
-    }
+    //if (m_a != nullptr)
+    //{
+    //    delete[] m_a;
+    //    m_a = nullptr;
+    //}
 }
 
 void  matrix4x4::setElement(int r, int c, float v)
@@ -81,11 +82,6 @@ float matrix4x4::getElement(int r, int c)
 void matrix4x4::setElement(int n, float v)
 {
     m_a[n]=v;
-}
-
-float matrix4x4::getElement(int n)
-{
-    return m_a[n];
 }
 
 matrix4x4 matrix4x4::operator+(const matrix4x4& rhs)
@@ -230,11 +226,11 @@ matrix4x4 matrix4x4::ident()
 
 matrix4x4 matrix4x4::identity()
 {
-    matrix4x4  e;
-    e.m_a[0] = 1;
-    e.m_a[5] = 1;
-    e.m_a[10] = 1;
-    e.m_a[15] = 1;
+    matrix4x4 e;
+    e.setElement(0, 1.0f);
+    e.setElement(5, 1.0f);
+    e.setElement(10, 1.0f);
+    e.setElement(15, 1.0f);
 
     return e;
 }
@@ -242,13 +238,15 @@ matrix4x4 matrix4x4::identity()
 
 std::ostream& operator<<(std::ostream& os, const matrix4x4& m)
 {
-    os << "\n";
     for (int row = 0; row < size; row++)
     {
         os << "| ";
         for (int col = 0; col < size; col++)
         {
-            os << const_cast<matrix4x4&>(m).getElement(MAKENDX(row, col, size)) << " ";
+            float a = const_cast<matrix4x4&>(m).getElement(MAKENDX(row, col, size));
+            if (fabs(a) < EPSILON) a = 0.0f;
+
+            os << std::setw(8) << std::setprecision(5) << a << " ";
         }
         os << " |\n";
     }
@@ -266,13 +264,12 @@ vector operator*(matrix4x4 m, vector v)     // post-multiply by vector
     return prod;
 }
 
-point operator*(matrix4x4 m, point pt)
+point operator*(matrix4x4 m, point p)
 {
-    point   prod;
-
-    prod.x(m.a00()*pt.x() + m.a01()*pt.y() + m.a02()*pt.z() + m.a03()*pt.w());
-    prod.y(m.a10()*pt.x() + m.a11()*pt.y() + m.a12()*pt.z() + m.a13()*pt.w());
-    prod.z(m.a20()*pt.x() + m.a21()*pt.y() + m.a22()*pt.z() + m.a23()*pt.w());
-    prod.w(m.a30()*pt.x() + m.a31()*pt.y() + m.a32()*pt.z() + m.a33()*pt.w());
+    point prod;
+    prod.x(m.a00()*p.x() + m.a01()*p.y() + m.a02()*p.z() + m.a03()*p.w());
+    prod.y(m.a10()*p.x() + m.a11()*p.y() + m.a12()*p.z() + m.a13()*p.w());
+    prod.z(m.a20()*p.x() + m.a21()*p.y() + m.a22()*p.z() + m.a23()*p.w());
+    prod.w(m.a30()*p.x() + m.a31()*p.y() + m.a32()*p.z() + m.a33()*p.w());
     return prod;
 }

@@ -22,6 +22,7 @@ public:
 
     void setElement(int r, int c, float v);
     void setElement(int, float v);
+    float getElement(int n) { return m_a[n]; }
 
     matrix2x2 operator+(const matrix2x2&);
     matrix2x2 operator-(const matrix2x2&);
@@ -38,7 +39,8 @@ public:
 private:
     int   m_nRows;
     int   m_nCols;
-    float* m_a;
+    //float* m_a;
+    float m_a[4];
 };
 
 std::ostream& operator<<(std::ostream&, const matrix2x2&);

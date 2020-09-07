@@ -3,22 +3,23 @@
 #include "matrix2x2.h"
 
 #include <iostream>
+#include <iomanip>
 
 #define MAKENDX(r,c,w) (r)*(w) + (c)
 
 const int size = 2;
 const int size2 = 4;
 
-matrix2x2::matrix2x2() : m_nRows(2), m_nCols(2), m_a(nullptr)
+matrix2x2::matrix2x2() : m_nRows(2), m_nCols(2)//, m_a(nullptr)
 {
-    m_a = new float[size2];
+    //m_a = new float[size2];
     for (int ndx = 0; ndx < size2; ndx++)
         m_a[ndx] = 0.0f;
 }
 
-matrix2x2::matrix2x2(float a, float b, float c, float d) : m_nRows(2), m_nCols(2), m_a(nullptr)
+matrix2x2::matrix2x2(float a, float b, float c, float d) : m_nRows(2), m_nCols(2)//, m_a(nullptr)
 {
-    m_a = new float[size2];
+    //m_a = new float[size2];
     m_a[0] = a;     m_a[1] = b;
     m_a[2] = c;     m_a[3] = d;
 }
@@ -28,7 +29,7 @@ matrix2x2::matrix2x2(const matrix2x2& rhs)
     m_nRows = rhs.m_nRows;
     m_nCols = rhs.m_nCols;
 
-    m_a = new float[size2];
+    //m_a = new float[size2];
     for (int ndx = 0; ndx < size2; ndx++)
     {
         m_a[ndx] = rhs.m_a[ndx];
@@ -41,7 +42,7 @@ matrix2x2 matrix2x2::operator=(const matrix2x2& rhs)
     {
         m_nRows = rhs.m_nRows;
         m_nCols = rhs.m_nCols;
-        m_a = new float[size2];
+        //m_a = new float[size2];
         for (int ndx = 0; ndx < size2; ndx++)
         {
             m_a[ndx] = rhs.m_a[ndx];
@@ -52,11 +53,11 @@ matrix2x2 matrix2x2::operator=(const matrix2x2& rhs)
 }
 matrix2x2::~matrix2x2()
 {
-    if (m_a != nullptr)
-    {
-        delete[] m_a;
-        m_a = nullptr;
-    }
+    //if (m_a != nullptr)
+    //{
+    //    delete[] m_a;
+    //    m_a = nullptr;
+    //}
 }
 
 void  matrix2x2::setElement(int r, int c, float v)
@@ -161,8 +162,18 @@ matrix2x2 matrix2x2::ident()
 
 std::ostream& operator<<(std::ostream& os, const matrix2x2& m)
 {
-    os << "| " << const_cast<matrix2x2&>(m).a00() << " " << const_cast<matrix2x2&>(m).a01() << " |\n";
-    os << "| " << const_cast<matrix2x2&>(m).a10() << " " << const_cast<matrix2x2&>(m).a11() << " |\n";
+    for (int row = 0; row < size; row++)
+    {
+        os << "|";
+        for (int col = 0; col < size; col++)
+        {
+            float a = const_cast<matrix2x2&>(m).getElement(MAKENDX(row, col, size));
+            if (fabs(a) < EPSILON) a = 0.0f;
+
+            os << std::setw(8) << std::setprecision(5) << a << " ";
+        }
+        os << " |\n";
+    }
 
     return os;
 }

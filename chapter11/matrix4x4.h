@@ -1,12 +1,6 @@
 #pragma once
 
-#undef minor
-#undef major
-
 #include <iostream>
-
-#include "matrix3x3.h"
-#include "matrix2x2.h"
 
 class matrix2x2;
 class matrix3x3;
@@ -59,7 +53,7 @@ public:
     void setElement(int r, int c, float v); 
     float getElement(int, int);
     void setElement(int, float v);
-    float getElement(int);
+    float getElement(int n) { return m_a[n]; }
 
     matrix4x4 operator+(const matrix4x4&);
     matrix4x4 operator-(const matrix4x4&);
@@ -72,17 +66,18 @@ public:
     matrix4x4 transpose();
     matrix4x4 inverse();
     matrix4x4 ident();
-    static matrix4x4 identity();    // creates an idenity matrix
     matrix3x3 minor(int, int);
     float cofactor(int, int);
 
+    static matrix4x4 identity();
 
 private:
     int   m_nRows;
     int   m_nCols;
-    float* m_a;
+    //float* m_a;
+    float m_a[16];
 };
 
 std::ostream& operator<<(std::ostream&, const matrix4x4&);
 vector operator*(matrix4x4, vector);     // post-multiply by vector
-point operator*(matrix4x4, point);       // post-multiply by point
+point operator*(matrix4x4, point);      // post-multiply by point

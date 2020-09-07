@@ -3,24 +3,25 @@
 #include "matrix2x2.h"
 
 #include <iostream>
+#include <iomanip>
 
 #define MAKENDX(r,c,w) (r)*(w) + (c)
 
 const int size = 3;
 const int size2 = 9;
 
-matrix3x3::matrix3x3() : m_nRows(3), m_nCols(3), m_a(nullptr)
+matrix3x3::matrix3x3() : m_nRows(3), m_nCols(3)//, m_a(nullptr)
 {
-    m_a = new float[size2];
+    //m_a = new float[size2];
     for (int ndx = 0; ndx < size2; ndx++)
         m_a[ndx] = 0.0f;
 }
 
 matrix3x3::matrix3x3(float a, float b, float c, 
                      float d, float e, float f,
-                     float g, float h, float i) : m_nRows(3), m_nCols(3), m_a(nullptr)
+                     float g, float h, float i) : m_nRows(3), m_nCols(3)//, m_a(nullptr)
 {
-    m_a = new float[size2];
+    //m_a = new float[size2];
     m_a[0] = a;     m_a[1] = b;    m_a[2] = c;
     m_a[3] = d;     m_a[4] = e;    m_a[5] = f;
     m_a[6] = g;     m_a[7] = h;    m_a[8] = i;
@@ -31,7 +32,7 @@ matrix3x3::matrix3x3(const matrix3x3& rhs)
     m_nRows = rhs.m_nRows;
     m_nCols = rhs.m_nCols;
 
-    m_a = new float[size2];
+    //m_a = new float[size2];
     for (int ndx = 0; ndx < size2; ndx++)
     {
         m_a[ndx] = rhs.m_a[ndx];
@@ -44,7 +45,7 @@ matrix3x3 matrix3x3::operator=(const matrix3x3& rhs)
     {
         m_nRows = rhs.m_nRows;
         m_nCols = rhs.m_nCols;
-        m_a = new float[size2];
+        //m_a = new float[size2];
         for (int ndx = 0; ndx < size2; ndx++)
         {
             m_a[ndx] = rhs.m_a[ndx];
@@ -55,11 +56,11 @@ matrix3x3 matrix3x3::operator=(const matrix3x3& rhs)
 }
 matrix3x3::~matrix3x3()
 {
-    if (m_a != nullptr)
-    {
-        delete[] m_a;
-        m_a = nullptr;
-    }
+    //if (m_a != nullptr)
+    //{
+    //    delete[] m_a;
+    //    m_a = nullptr;
+    //}
 }
 
 void  matrix3x3::setElement(int r, int c, float v)
@@ -212,11 +213,23 @@ matrix3x3 matrix3x3::ident()
 
 std::ostream& operator<<(std::ostream& os, const matrix3x3& m)
 {
-    os << "| " << const_cast<matrix3x3&>(m).a00() << " " << const_cast<matrix3x3&>(m).a01() << " " << const_cast<matrix3x3&>(m).a02() << " |\n";
-    os << "| " << const_cast<matrix3x3&>(m).a10() << " " << const_cast<matrix3x3&>(m).a11() << " " << const_cast<matrix3x3&>(m).a12() << " |\n";
-    os << "| " << const_cast<matrix3x3&>(m).a20() << " " << const_cast<matrix3x3&>(m).a21() << " " << const_cast<matrix3x3&>(m).a22() << " |\n";
+    for (int row = 0; row < size; row++)
+    {
+        os << "|";
+        for (int col = 0; col < size; col++)
+        {
+            float a = const_cast<matrix3x3&>(m).getElement(MAKENDX(row, col, size));
+            if (fabs(a) < EPSILON) a = 0.0f;
+
+            os << std::setw(8) << std::setprecision(5) << a << " ";
+        }
+        os << " |\n";
+    }
+
     return os;
 }
+
+
 
 
 

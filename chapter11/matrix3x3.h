@@ -1,8 +1,5 @@
 #pragma once
 
-#undef minor
-#undef major
-
 #include <iostream>
 
 class matrix2x2;
@@ -37,6 +34,7 @@ public:
 
     void setElement(int r, int c, float v);
     void setElement(int, float v);
+    float getElement(int n) { return m_a[n];}
 
     matrix3x3 operator+(const matrix3x3&);
     matrix3x3 operator-(const matrix3x3&);
@@ -55,7 +53,8 @@ public:
 private:
     int   m_nRows;
     int   m_nCols;
-    float* m_a;
+    //float* m_a;
+    float m_a[9];
 };
 
 std::ostream& operator<<(std::ostream&, const matrix3x3&);
