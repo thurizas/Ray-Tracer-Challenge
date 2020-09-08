@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#undef minor
+
 class matrix2x2;
 class matrix3x3;
 

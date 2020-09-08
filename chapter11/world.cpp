@@ -209,11 +209,11 @@ color world::intersect(ray r, int remaining, int intNdx)
 */
 void world::prepare(ray r, pIntDataT pID, std::vector<std::pair<int,float>>* pInters, int intNdx)
 {
-    int cntIntersections = pInters->size();
+    unsigned int cntIntersections = pInters->size();
 
     if (nullptr != pID)
     {
-        unsigned int ndx;
+      unsigned int ndx;
         if (-1 == intNdx)                  // defalut value -- use the first positive intersection
         {
 	        for (ndx = 0; ndx < pInters->size(); ndx++)
@@ -231,7 +231,7 @@ void world::prepare(ray r, pIntDataT pID, std::vector<std::pair<int,float>>* pIn
         std::vector<int>      vecObjects;  // object container
         bool bContinue = true;
 
-        for (int ints = 0; ints < cntIntersections && bContinue; ints++)
+        for (unsigned int ints = 0; ints < cntIntersections && bContinue; ints++)
         { 
             std::vector<int>::iterator  iter;
             if (ints == ndx)                  // our intersection is the one we are looking at

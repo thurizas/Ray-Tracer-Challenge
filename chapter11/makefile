@@ -13,7 +13,7 @@ PROG: $(OBJS)
 	$(CC) -c $(CCFLAGS) chapter11.cpp  -o chapter11.o
 	$(LK) chapter11.o $(OBJS) -o chapter11
 
-all : clean prog
+all : clean PROG
 
 camera.o : camera.cpp camera.h		    	        
 	$(CC) -c $(CCFLAGS) camera.cpp -o camera.o

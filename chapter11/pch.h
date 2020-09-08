@@ -1,6 +1,8 @@
 #ifndef PCH_H
 #define PCH_H
 
+// to undefine the minor macro being pulled in from sys/sysmacros.h
+#undef minor
 
 
 const float EPSILON = 0.00001f;
