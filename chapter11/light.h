@@ -18,7 +18,7 @@ public:
     point p() { return m_ptLoc; }
     void  p(point pt) { m_ptLoc = pt; }
 
-    color lighting(material m, object* o, point pt, vector eyev, vector normalv,bool inShadow=false);
+    color lighting(material m, object* o, point pt, vector eyev, vector normalv, bool inShadow = false, bool bDebug = false);
 
 private:
     color m_intensity;

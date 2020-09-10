@@ -111,7 +111,7 @@ color world::intersect(ray r, int remaining, int intNdx)
     std::vector<std::pair<int, float>> vecIntersections;
 
     pID = new intDataT;
-    if (m_bDebug) std::cout << "\nRecursion count " << remaining << " Using ray: " << r << std::endl;
+    //if (m_bDebug) std::cout << "\nRecursion count " << remaining << " Using ray: " << r << std::endl;
 
 
     if (m_mapObjects.size() > 0)                    // we have objects to work with
@@ -126,7 +126,7 @@ color world::intersect(ray r, int remaining, int intNdx)
                 sphere* pSphere = dynamic_cast<sphere*>((*iter).second);
                 if (pSphere->intersect(r, &intInfo))
                 {
-				  //if (m_bDebug) std::cout << "hit sphere " << (*iter).second->getID() << std::endl;
+				    //if (m_bDebug) std::cout << "hit sphere " << (*iter).second->getID() << std::endl;
                     vecIntersections.push_back(std::pair<int, float>(pSphere->getID(), intInfo.t1()));
                     vecIntersections.push_back(std::pair<int, float>(pSphere->getID(), intInfo.t2()));
 
@@ -138,7 +138,7 @@ color world::intersect(ray r, int remaining, int intNdx)
                 plane* pPlane = dynamic_cast<plane*>((*iter).second);
                 if (pPlane->intersect(r, &intInfo))
                 {
-				  //if (m_bDebug) std::cout << "hit plane " << (*iter).second->getID() << std::endl;
+				    //if (m_bDebug) std::cout << "hit plane " << (*iter).second->getID() << std::endl;
                     vecIntersections.push_back(std::pair<int, float>(pPlane->getID(), intInfo.t1()));
                     bret = true;
                 }
@@ -152,14 +152,14 @@ color world::intersect(ray r, int remaining, int intNdx)
 
     }
 
-    //if (m_bDebug)
-    //{
-    //    for (auto inter : vecIntersections)
-    //    {
-    //        std::cout << inter.second << ":" << inter.first << ", ";
-    //    }
-    //    std::cout << std::endl;
-    //}
+    if (m_bDebug)
+    {
+        for (auto inter : vecIntersections)
+        {
+            std::cout << inter.second << ":" << inter.first << ", ";
+        }
+        std::cout << std::endl;
+    }
 
     std::sort(vecIntersections.begin(), vecIntersections.end(), [](std::pair<int, float>lhs, std::pair<int, float> rhs) {return lhs.second < rhs.second;});
 
@@ -331,36 +331,41 @@ void world::prepare(ray r, pIntDataT pID, std::vector<std::pair<int,float>>* pIn
 */
 color world::shadeHit(pIntDataT pID, int remaining)
 {
-
-  color clrRet(0.0f, 0.0f, 0.0f);
-  float reflectance = 0.0f;
-
+    color clrRet;
+    color baseColor(0.0f, 0.0f, 0.0f);
+    float reflectance = 0.0f;
+	
+    //if (m_bDebug) std::cout << "Top of shadeHit, remaining is: "<< remaining << " intersection info: \n" << *pID << std::endl;
+    
     std::vector<light*>::iterator    iter = m_vecLights.begin();
     while (m_vecLights.end() != iter)
     {
         bool bShadowed = isShadowed(pID->overPt, (*iter));
-        clrRet = clrRet + (*iter)->lighting(*((pID->pObject)->getMat()), pID->pObject, pID->overPt, pID->eyev, pID->normalv, bShadowed);
+        baseColor = baseColor + (*iter)->lighting(*((pID->pObject)->getMat()), pID->pObject, pID->overPt, pID->eyev, pID->normalv, bShadowed, m_bDebug);
         iter++;
     }
-
-    //if ((pID->pObject->getMat()->reflect() > 0.0f) && (pID->pObject->getMat()->transpar() > 0.0f))
-    //{
-        reflectance = schlick(pID);
-    //    return reflected * reflectance;// +refracted * (1.0f - reflectance);
-    //}
-
-
+    
     color reflected = reflectColor(pID, remaining);
-    
     color refracted = refractColor(pID, remaining);
-    
-	if (m_bDebug) std::cout << *pID << std::endl;
-    if (m_bDebug) std::cout << "base color is     : " << clrRet << std::endl;
+    reflectance = schlick(pID);
+
+    if ((pID->pObject->getMat()->reflect() > 0.0f) && (pID->pObject->getMat()->transpar() > 0.0f))
+    {
+
+        clrRet = baseColor + reflected * reflectance + refracted * (1.0f - reflectance);
+    }
+    else
+    {
+        clrRet = baseColor + reflected + refracted;
+    }
+
+
 	if (m_bDebug) std::cout << "reflected color is: " << reflected << std::endl;
 	if (m_bDebug) std::cout << "refracted color is: " << refracted << std::endl;
 	if (m_bDebug) std::cout << "reflectance is    : " << reflectance << std::endl;
-	
-    return clrRet + reflected + refracted;
+    if (m_bDebug) std::cout << "object color is     : " << clrRet << std::endl;
+
+    return clrRet;
 }
 
 /*
@@ -388,7 +393,7 @@ color world::reflectColor(pIntDataT pID, int remaining)
     {
         ray reflectRay = ray(pID->overPt, pID->reflectv);
         retColor = intersect(reflectRay, (remaining-1));
-        retColor = retColor*reflective;
+        //retColor = retColor*reflective;
 
         return retColor;
     }
@@ -431,7 +436,7 @@ color world::refractColor(pIntDataT pID, int remaining)
         ray refractRay(pID->underPt, dir);
 
         retColor = intersect(refractRay, (remaining -1), -1);
-        retColor = retColor * transparent;
+        //retColor = retColor * transparent;
 
         return retColor;
     }

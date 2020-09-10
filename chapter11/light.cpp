@@ -4,7 +4,7 @@
 #include "object.h"
 
 // implements phong shading
-color light::lighting(material m, object* o, point pt, vector eyev, vector normalv, bool inShadow)
+color light::lighting(material m, object* o, point pt, vector eyev, vector normalv, bool inShadow, bool bDebug)
 {
     color ambient;
     color diffuse;
@@ -43,6 +43,12 @@ color light::lighting(material m, object* o, point pt, vector eyev, vector norma
             specular = i() * m.sp() * factor;    // contribution to specular
         }
     }
+
+    if (bDebug) std::cout << "material is: " << m << std::endl;
+    if (bDebug) std::cout << "effective color is      : " << effColor << std::endl;
+    if (bDebug) std::cout << "ambient contribution is : " << ambient << std::endl;
+    if (bDebug) std::cout << "diffuse contribution is : " << diffuse << std::endl;
+    if (bDebug) std::cout << "specular contribution is: " << specular << std::endl;
 
     if (inShadow)
         return ambient;

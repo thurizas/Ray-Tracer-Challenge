@@ -41,7 +41,7 @@ void refractionTest8(bool flag = false);    // shadeHit cal'cs correct color
 void fresnelTest1(bool flag = false);       // reflectance under total internal reflectance
 void fresnelTest2(bool flag = false);       // ray hits surface at 90 degree angle
 void fresnelTest3(bool flag = false);       // n2 > n1 and angle is small
-void fresnetTest4(bool flag = false);       // shadeHit cal'cs correct
+void fresnelTest4(bool flag = false);       // shadeHit cal'cs correct
 
 void reflectionTest(int, int);
 void refractionTest(int, int);
@@ -92,13 +92,13 @@ int main(int argc, char** argv)
     //refractionTest7(bDebug);                            
     //refractionTest8(bDebug);          // shadeHit cal'cs correct color
 
-    //fresnelTest1(g_bDebug);                                 
-    //fresnelTest2(g_bDebug);                                 
-    //fresnelTest3(g_bDebug);                                 
-    //fresnetTest4(g_bDebug);                                 
+    //fresnelTest1(bDebug);                                 
+    //fresnelTest2(bDebug);                                 
+    //fresnelTest3(bDebug);                                 
+    //fresnelTest4(bDebug);                                 
 
     reflectionTest(width, height);                // main reflection test
-    //refractionTest(width, height);                // main refraction test
+    refractionTest(width, height);                // main refraction test
     //mainTest(width, height);
 }
 
@@ -339,7 +339,6 @@ void refractionTest6(bool flag)
     world::deleteWorld();
 }
 
-// TODO : check defPattern is working correctly, check refracted direction and intersection point.
 void refractionTest7(bool flag)
 {
     // test #7 - features/world.feature - the refracted color with a refracted ray
@@ -357,6 +356,7 @@ void refractionTest7(bool flag)
     world::deleteWorld();
 }
 
+// TODO : fix this, test give incorrect colors...possibly error in lighting function?
 void refractionTest8(bool flag)
 {
     // test #8 - features/world.feature - shade_hit() with a transparent material
@@ -375,10 +375,12 @@ void refractionTest8(bool flag)
     pW->addObject(&floor);
     pW->addObject(&ball);
 
+    std::cout << "\n*** test #8 ************************" << std::endl;
+
     ray r(point(0.0f, 0.0f, -3.0f), vector(0.0f, -(float)sqrt(2) / 2.0f, (float)sqrt(2) / 2.0f));
     color cl = pW->intersect(r);
 
-    std::cout << "\n*** test #8 ************************" << std::endl;
+    
     std::cout << "intersections are (1.41421:3) : " << std::endl;
     std::cout << "intersections are (1.92237:4) : " << std::endl;
 
@@ -388,67 +390,86 @@ void refractionTest8(bool flag)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Fresnel tests
-void fresnelTest1()
+void fresnelTest1(bool f)
 {
-    world*  pW = world::createWorld();
+    world*  pW = world::createWorld(f);
 
     sphere* s1 = glassSphere();
     pW->addObject(s1);
 
     ray r(point(0.0f, 0.0f, (float)sqrt(2) / 2), vector(0.0f, 1.0f, 0.0f));
 
-    pW->intersect(r);
-
     std::cout << "\n*** test #1 ************************" << std::endl;
-    //float     reflectance = pW->schlick(pID);
-    //std::cout << "\n The reflectance is: (1.0)" << reflectance << std::endl;
+    pW->intersect(r);
+    std::cout << "reflectance should be 1.0" << std::endl;
     std::cout << "\n*************************************" << std::endl;
 
     world::deleteWorld();
     delete s1;
 }
 
-void fresnelTest2()
+void fresnelTest2(bool f)
 {
-    world* pW = world::createWorld();
+    world* pW = world::createWorld(f);
 
     sphere* s1 = glassSphere();
     pW->addObject(s1);
 
     ray r(point(0.0f, 0.0f, 0.0f), vector(0.0f, 1.0f, 0.0f));
 
+    std::cout << "\n*** test #2 ************************" << std::endl;
     pW->intersect(r);
-
-
-    //float     reflectance = pW->schlick(pID);
-    //std::cout << "\n The reflectance is (0.04): " << reflectance << std::endl;
+    std::cout << "reflectanace should be 0.04" << std::endl;
     std::cout << "\n*************************************" << std::endl;
 
     world::deleteWorld();
     delete s1;
 }
 
-void fresnelTest3()
+void fresnelTest3(bool f)
 {
-    world* pW = world::createWorld();
+    world* pW = world::createWorld(f);
 
     sphere* s1 = glassSphere();
     pW->addObject(s1);
 
     ray r(point(0.0f, 0.99f, -2.0f), vector(0.0f, 0.0f, 1.0f));
 
+    std::cout << "\n*** test #3 ************************" << std::endl;
     pW->intersect(r);
-
-    //float     reflectance = pW->schlick(pID);
-    //std::cout << "\n The reflectance is (0.48873): " << reflectance << std::endl;
+    std::cout << "\n The reflectance should be 0.48873 " << std::endl;
     std::cout << "\n*************************************" << std::endl;
 
     world::deleteWorld();
     delete s1;
 }
 
-void fresnetTest4()
-{}
+void fresnelTest4(bool f)
+{
+    world* pW = defaultWorld(f);
+    ray r(point(0, 0, -3.0f), vector(0, -sqrt(2.0f) / 2.0f, sqrt(2.0f) / 2.0f));
+
+    plane p1;
+    p1.getMat()->reflect(0.50f);
+    p1.getMat()->transpar(0.50f);
+    p1.getMat()->refractIndex(1.5f);
+    p1.xform(translation(0.0f, -1.0f, 0.0f));
+
+    sphere s1(point(0.0f, 0.0f, 0.0f));
+    s1.getMat()->c(color(1.0f, 0.0f, 0.0f));
+    s1.getMat()->a(0.5f);
+    s1.xform(translation(0.0f, -3.5f, -0.5f));
+
+    pW->addObject(&p1);
+    pW->addObject(&s1);
+
+    std::cout << "\n*** test #4 ************************" << std::endl;
+    pW->intersect(r);
+    std::cout << "\n The color should be (0.93391, 0.69643, 0.69243)" << std::endl;
+    std::cout << "\n*************************************" << std::endl;
+
+    world::deleteWorld();
+}
 
 
 void reflectionTest(int width, int height)
@@ -511,7 +532,7 @@ void reflectionTest(int width, int height)
     canvas i(c.hsize(), c.vsize());
     c.render(w, &i);
 
-    i.writePPM("./chapter11a.ppm");
+    i.writePPM("./chapter11a1.ppm");
 
     world::deleteWorld();
 }
@@ -537,6 +558,7 @@ void refractionTest(int width, int height)
     outer.xform(scale(2.0f, 2.0f, 2.0f));
     material* pmat3 = outer.getMat();
     //pmat3->c(color(254.0f/255.0f, 254.0f / 255.0f, 252.0f / 255.0f));
+    pmat3->c(color(0, 0, 0));
     pmat3->a(1.0f);
     pmat3->transpar(1.0f);
     pmat3->refractIndex(1.5f);
@@ -558,7 +580,7 @@ void refractionTest(int width, int height)
     canvas i(c.hsize(), c.vsize());
     c.render(w, &i);
 
-    i.writePPM("./chapter11b.ppm");
+    i.writePPM("./chapter11b1.ppm");
 }
 
 void mainTest(int width, int height)
