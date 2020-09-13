@@ -32,8 +32,8 @@ int main(int argc, char** argv)
 {
     int choice;
     bool   bDebug=false;
-    int width = 640;
-    int height = 400;
+    int width =  640;
+    int height =  400;
 
     while (-1 != (choice = getopt(argc, argv, "w:h:d")))
     {
@@ -186,62 +186,61 @@ void cubeMain(int width, int height, bool f)
     c1.getMat()->d(0.7f);
     c1.getMat()->sp(0.3f);
 
-    // table top
-    cube c2;
-    //c2.xform(translation(-10.0f, 0.5f, 10.0f)*scale(2.5f, 0.1f, 1.0f)*rotation_y(-45));
+    cube c2;           // table top
+    cube c3;           // back left leg
+    cube c4;           // back right leg
+    cube c5;           // front left leg
+    cube c6;           // front right leg
+
+    material* tblMat = new material;
+    tblMat->c(color(185.0f / 255.0f, 115.0f / 255.0f, 115.0f / 255.0f));
+    tblMat->d(0.7f);
+    tblMat->sp(0.3f);
+    tblMat->sh(50.0f);
+
     c2.xform(translation(1.0f, 0.5f, 1.0f)*scale(2.5f, 0.1f, 1.0f));
-    c2.getMat()->c(color(185.0f/255.0f, 115.0f/255.0f, 115.0f/255.0f));
+    c2.getMat()->c(color(185.0f / 255.0f, 115.0f / 255.0f, 115.0f / 255.0f));
     c2.getMat()->d(0.7f);
     c2.getMat()->sp(0.3f);
     c2.getMat()->sh(50);
 
-    // back left leg
-    cube c3;
-    //c3.xform(translation(-8.8f, 0.125f, 9.6f)*scale(0.05f, 0.25f, 0.05f)*rotation_y(-45));
-    c3.xform(translation(-1.25f, 0.125f, 0.45f)*scale(0.05f, 0.25f, 0.05f));
     c3.getMat()->c(color(185.0f / 255.0f, 115.0f / 255.0f, 115.0f / 255.0f));
     c3.getMat()->d(0.7f);
     c3.getMat()->sp(0.3f);
     c3.getMat()->sh(50);
 
-    // back right leg
-    cube c4;
-    //c4.xform(translation(-8.8f, 0.125f, 10.8f)*scale(0.05f, 0.25f, 0.05f)*rotation_y(-45));
-    c4.xform(translation(1.25f, 0.125f, 0.45f)*scale(0.05f, 0.25f, 0.05f));
     c4.getMat()->c(color(185.0f / 255.0f, 115.0f / 255.0f, 115.0f / 255.0f));
     c4.getMat()->d(0.7f);
     c4.getMat()->sp(0.3f);
     c4.getMat()->sh(50);
 
-    // front left leg
-    cube c5;
-    //c5.xform(translation(-11.2f, 0.125f, 9.6f)*scale(0.05f, 0.25f, 0.05f)*rotation_y(-45));
-    c5.xform(translation(-1.25f, 0.125f, -0.45f)*scale(0.05f, 0.25f, 0.05f));
     c5.getMat()->c(color(185.0f / 255.0f, 115.0f / 255.0f, 115.0f / 255.0f));
     c5.getMat()->d(0.7f);
     c5.getMat()->sp(0.3f);
     c5.getMat()->sh(50);
 
-    // front right leg
-    cube c6;
-    //c6.xform(translation(-11.2f, 0.125f, 10.4f)*scale(0.05f, 0.25f, 0.05f)*rotation_y(-45));
-    c6.xform(translation(1.25f, 0.125f, -0.45f)*scale(0.05f, 0.25f, 0.05f));
     c6.getMat()->c(color(185.0f / 255.0f, 115.0f / 255.0f, 115.0f / 255.0f));
     c6.getMat()->d(0.7f);
     c6.getMat()->sp(0.3f);
     c6.getMat()->sh(50);
+    
+    c3.xform(translation( 3.00f, 0.1f,   1.0f)*scale(0.05f, 0.25f, 0.05f));  // back right leg
+    c5.xform(translation( 3.00f, 0.27f, -1.1f)*scale(0.05f, 0.25f, 0.05f));  // front right leg
+    c4.xform(translation(-1.30f, 0.1f,   1.0f)*scale(0.05f, 0.25f, 0.05f));   // back left leg
+    c6.xform(translation(-1.28f, 0.26f, -1.1f)*scale(0.05f, 0.25f, 0.05f));  // front left leg
+
 
     // light green sphere
     sphere sp1(point(0.0f, 0.0f, 0.0f));
     sp1.xform(translation(5.0f, 1.0, 5.0f));
     sp1.getMat()->c(color(0.1f, 1, 0.5f));
-    sp1.getMat()->a(0.9f);
+    //sp1.getMat()->a(0.5f);
     sp1.getMat()->d(0.7f);
     sp1.getMat()->sp(0.3f);
 
     // blue sphere
     sphere sp2(point(0.0f, 0.0f, 0.0f));
-    sp2.xform(translation(1.0f, 1.5, 1.0f));
+    sp2.xform(translation(1.0f, 1.60, 1.0f));
     sp2.getMat()->c(color(0.1f, 0.5f, 1.0f));
     sp2.getMat()->d(0.7f);
     sp2.getMat()->sp(0.3f);
@@ -253,7 +252,6 @@ void cubeMain(int width, int height, bool f)
     camera c(width, height, PI/3.0f, matrix4x4::identity());
     // move the camera - viewTransform(from, to, up)
     c.t(viewTransform(point(-0.0f, 1.5f, -10.0f), point(0.0f, 1.0f, 0.0f), vector(0.0f, 1.0f, 0.0f)));
-    //c.t(viewTransform(point(-3.0f, 1.5f, -3.0f), point(-10.0f, 1.0f, 20.0f), vector(0.0f, 1.0f, 0.0f)));
 
     // build da world...
     world* w = world::createWorld();
@@ -264,8 +262,8 @@ void cubeMain(int width, int height, bool f)
     w->addObject(&c2);     // table top
     w->addObject(&c3);     // leg
     w->addObject(&c4);     // leg
-    w->addObject(&c3);     // leg
-    w->addObject(&c4);     // leg
+    w->addObject(&c5);     // leg
+    w->addObject(&c6);     // leg
     w->addObject(&sp1);
     w->addObject(&sp2);
     //w->addObject(&sp3);
