@@ -40,7 +40,7 @@ typedef struct tag_int
 class ray;
 class material;
 
-enum OBJ_TYPE { TEST=-1, SPHERE = 0, CUBE, CONE, CYLINDER, PLANE};
+enum OBJ_TYPE { TEST=-1, SPHERE = 0, PLANE=1, CUBE=2, CONE=3, CYLINDER=4 };
 
 class object
 {
@@ -65,7 +65,7 @@ public:
 protected:
     unsigned int   m_nID;                  // object ID;
     material*      m_pMat;                 // objects material; 
-    matrix4x4      m_xform;                // set to idenity matrix
+    //matrix4x4      m_xform;                // set to idenity matrix
 
 private:
     unsigned short m_nType;                // type of object

@@ -3,6 +3,7 @@
 #include "world.h"
 #include "sphere.h"
 #include "plane.h"
+#include "cube.h"
 #include "ray.h"
 #include "util.h"
 
@@ -126,7 +127,6 @@ color world::intersect(ray r, int remaining, int intNdx)
                 sphere* pSphere = dynamic_cast<sphere*>((*iter).second);
                 if (pSphere->intersect(r, &intInfo))
                 {
-				    //if (m_bDebug) std::cout << "hit sphere " << (*iter).second->getID() << std::endl;
                     vecIntersections.push_back(std::pair<int, float>(pSphere->getID(), intInfo.t1()));
                     vecIntersections.push_back(std::pair<int, float>(pSphere->getID(), intInfo.t2()));
 
@@ -141,6 +141,15 @@ color world::intersect(ray r, int remaining, int intNdx)
 				    //if (m_bDebug) std::cout << "hit plane " << (*iter).second->getID() << std::endl;
                     vecIntersections.push_back(std::pair<int, float>(pPlane->getID(), intInfo.t1()));
                     bret = true;
+                }
+            }
+            else if (CUBE == (*iter).second->getType())
+            {
+                cube* pCube = dynamic_cast<cube*>((*iter).second);
+                if (pCube->intersect(r, &intInfo))
+                {
+                    vecIntersections.push_back(std::pair<int, float>(pCube->getID(), intInfo.t1()));
+                    vecIntersections.push_back(std::pair<int, float>(pCube->getID(), intInfo.t2()));
                 }
             }
             else
@@ -306,6 +315,19 @@ void world::prepare(ray r, pIntDataT pID, std::vector<std::pair<int,float>>* pIn
                 pID->overPt = pID->pt + pID->normalv*EPSILON;
                 pID->underPt = pID->pt - pID->normalv*EPSILON;
                 pID->reflectv = r.direction().reflect(pID->normalv);
+            }
+            else if (CUBE == (o)->getType())
+            {
+                pID->normalv = (dynamic_cast<cube*>(o))->normalAt(pID->pt);
+                if (pID->normalv.dot(pID->eyev) < 0)
+                {
+                    pID->inside = true;
+                    pID->normalv = -pID->normalv;
+                }
+                pID->overPt = pID->pt + pID->normalv*EPSILON;
+                pID->underPt = pID->pt - pID->normalv*EPSILON;
+                pID->reflectv = r.direction().reflect(pID->normalv);
+
             }
             else
             {
@@ -538,6 +560,15 @@ bool world::intersectShadow(ray r, float d)
                     bhit = true;
                 }
             }
+            else if (CUBE == (*iter).second->getType())
+            {
+                cube* pCube = dynamic_cast<cube*>((*iter).second);
+                if (pCube->intersect(r, &intInfo))
+                {
+                    vecShadowHits.push_back(std::pair<int, float>(pCube->getID(), intInfo.t1()));
+                    bhit = true;
+                }
+            }
             else
             {
                 std::cerr << "unknown geometry type" << std::endl;
@@ -649,6 +680,12 @@ std::ostream& operator<<(std::ostream& os, const world& rhs)
                 plane* p = dynamic_cast<plane*>((*iter).second);
                 os << "PLANE:" << std::endl;
                 os << *(p);
+            }
+            else if (CUBE == ((*iter).second)->getType())
+            {
+                cube* c = dynamic_cast<cube*>((*iter).second);
+                os << "CUBE:" << std::endl;
+                os << *(c);
             }
             else
             {

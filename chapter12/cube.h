@@ -7,13 +7,14 @@
 #include "point.h"
 #include "matrix4x4.h"
 
-class plane : public object
+
+class cube : public object
 {
 public:
-    plane(material* pm = new material, unsigned short t = PLANE) : object(pm, t), m_ptCenter(0,0,0), m_vecNormal(0,1,0), m_matXform(matrix4x4::identity())
-  { }
+    cube(material* pm = new material, unsigned short t = CUBE) : object(pm, t), m_ptCenter(0, 0, 0), m_vecNormal(0, 1, 0), m_matXform(matrix4x4::identity())
+    { }
 
-  ~plane() {if(m_pMat != nullptr) { delete m_pMat; m_pMat = nullptr;}}
+    ~cube() { if (m_pMat != nullptr) { delete m_pMat; m_pMat = nullptr; } }
 
     point getCenter() { return m_ptCenter; }
     vector getNormal() { return m_vecNormal; }
@@ -26,16 +27,19 @@ public:
 
 
     int       getID() { return m_nID; }
-
+    // TODO : needs to be -- pCube->intersect(r, &intInfo)  intInfo is 
     bool intersect(const ray&, pInterInfo);
     vector normalAt(point worldPt);
-    vector localNormalAt(point);                
+    vector localNormalAt(point);
 
 private:
     point     m_ptCenter;
     vector    m_vecNormal;
     matrix4x4 m_matXform;
 
+    std::pair<float, float> checkAxis(float, float);
+
 };
 
-std::ostream& operator<<(std::ostream&, const plane&);
+std::ostream& operator<<(std::ostream&, const cube&);
+

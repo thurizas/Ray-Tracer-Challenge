@@ -14,7 +14,7 @@
 class sphere : public object
 {
 public:
-    sphere(point pt, float r = 1.0f, material* pm = new material, unsigned short t = SPHERE) : object(pm, t), m_ptCenter(pt), m_fRadius(r), m_matXform(m_xform)
+    sphere(point pt, float r = 1.0f, material* pm = new material, unsigned short t = SPHERE) : object(pm, t), m_ptCenter(pt), m_fRadius(r), m_matXform(matrix4x4::identity())
     { }
     ~sphere() { }
 
